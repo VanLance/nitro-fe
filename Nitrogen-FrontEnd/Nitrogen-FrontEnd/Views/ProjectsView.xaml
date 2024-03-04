@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Nitrogen_FrontEnd.Views"
         mc:Ignorable="d"
-        Title="ProjectsView" Height="450" Width="800">
+        Title="ProjectsView" Height="450" Width="800" >
     <Grid>
-        
+    <Label Content="Projects" Margin="10,0,0,86"/>
+        <DataGrid x:Name="projectList" Margin="10,38,685,86"/>
     </Grid>
 </Window>
