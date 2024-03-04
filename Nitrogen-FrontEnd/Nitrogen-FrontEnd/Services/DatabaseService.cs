@@ -52,23 +52,40 @@ namespace Nitrogen_FrontEnd.Services
 
         public void AddProject(Project project)
         {
-            Console.WriteLine(project.ProjectNumber.ToString() + "==========zzzzzzzz");
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
 
-                string insertQuery = "INSERT INTO Project (ProjectNumber) VALUES (@ProjectNumber)";
+                string insertQuery = "INSERT INTO Project (ProjectNumber, Description) VALUES (@ProjectNumber, @Description)";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
                     
                     command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
-
+                    command.Parameters.AddWithValue("@Description", project.Description);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
             }
         }
 
-        // Add more methods for CRUD operations as needed (e.g., AddProject, UpdateProject, DeleteProject)
+        public void AddEquipment(Equipment equipment)
+        {
 
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
+                string insertQuery = "INSERT INTO Equipment (ProjectNumber, Description, EquipmentId, ControlPanel) VALUES (@ProjectNumber, @Description, @ControlPanel, @EquipmentId)";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                {
+
+                    command.Parameters.AddWithValue("@ProjectNumber", equipment.ProjectNumber);
+                    command.Parameters.AddWithValue("@Description", equipment.Description);
+                    command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
+                    command.Parameters.AddWithValue("@ControlPanel", equipment.ControlPanel);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

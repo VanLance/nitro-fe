@@ -9,7 +9,7 @@ namespace Nitrogen_FrontEnd.Models
     public class Equipment
     {
         public int Id { get; set; }
-        public int ProjectNumber { get; set; }
+        public string ProjectNumber { get; set; }
         public string Area { get; set; }
         public string EquipmentId { get; set; }
         public string EquipmentSubId { get; set; }
