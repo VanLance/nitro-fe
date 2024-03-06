@@ -138,6 +138,37 @@ namespace Nitrogen_FrontEnd.Services
             return equipmentList;
         }
 
+        public Equipment GetEquipmentByIdAndProjectNumber(string id, string projectNumber)
+        {
+            Equipment equipment = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string projectQuery = "SELECT * FROM Equipment WHERE ProjectNumber = @ProjectNumber and Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(projectQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@ProjectNumber", projectNumber);
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+
+                        equipment = new Equipment
+                        {
+                            ProjectNumber = reader["ProjectNumber"].ToString(),
+
+                        };
+
+                    }
+                    return equipment;
+                }
+            }
+        }
+
         public void AddEquipment(Equipment equipment)
         {
 
