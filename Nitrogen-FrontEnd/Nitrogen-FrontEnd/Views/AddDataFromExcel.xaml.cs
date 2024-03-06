@@ -20,6 +20,7 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class AddDataFromExcel : Window
     {
+        ExcelService excelService;
         public AddDataFromExcel()
         {
             InitializeComponent();
@@ -39,7 +40,8 @@ namespace Nitrogen_FrontEnd.Views
         {
             if (txtFilePath.Text != null)
             {
-                ExcelService.ReadExcelFile(txtFilePath.Text);
+                excelService = new ExcelService(txtFilePath.Text);
+                excelService.ReadExcelFile();
             }
             else
             {

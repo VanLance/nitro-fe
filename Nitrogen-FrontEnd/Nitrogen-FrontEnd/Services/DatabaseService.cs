@@ -50,6 +50,39 @@ namespace Nitrogen_FrontEnd.Services
             return projects;
         }
 
+        public List<Equipment> GetEquipmentForProject(string projectNumber)
+        {
+            List<Equipment> equipmentList = new List<Equipment>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipmentQuery = $"SELECT * From Equipment WHERE ProjectNumber = {projectNumber}";
+
+                using (SqlCommand command = new SqlCommand(equipmentQuery, connection))
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while ( reader.Read() )
+                    {
+                        Equipment equipment = new Equipment
+                        {
+                            ProjectNumber = reader["ProjectNumber"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            EquipmentId = reader["EquipmentId"].ToString(),
+                            ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
+                            Area = reader["Area"].ToString(),
+                        };
+
+                        equipmentList.Add(equipment);
+                    }
+
+                    reader.Close();
+                }
+            }
+
+            return equipmentList;
+        }
+
         public void AddProject(Project project)
         {
 
