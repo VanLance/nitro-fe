@@ -59,7 +59,7 @@ namespace Nitrogen_FrontEnd.Services
                 string insertQuery = "INSERT INTO Project (ProjectNumber, Description) VALUES (@ProjectNumber, @Description)";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
-                    
+
                     command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
                     command.Parameters.AddWithValue("@Description", project.Description);
                     connection.Open();
@@ -74,14 +74,34 @@ namespace Nitrogen_FrontEnd.Services
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
 
-                string insertQuery = "INSERT INTO Equipment (ProjectNumber, Description, EquipmentId, ControlPanel) VALUES (@ProjectNumber, @Description, @ControlPanel, @EquipmentId)";
+                string insertQuery = "INSERT INTO Equipment (" +
+                            "ProjectNumber, Description, EquipmentId, ControlPanel, Area" +
+                        ") VALUES (" +
+                            "@ProjectNumber, @Description, @EquipmentId, @ControlPanel, @Area" +
+                        ")";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
 
                     command.Parameters.AddWithValue("@ProjectNumber", equipment.ProjectNumber);
-                    command.Parameters.AddWithValue("@Description", equipment.Description);
                     command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
-                    command.Parameters.AddWithValue("@ControlPanel", equipment.ControlPanel);
+                    command.Parameters.AddWithValue("@Area", equipment.Area);
+                    if (equipment.Description != null)
+                    {
+                        command.Parameters.AddWithValue("@Description", equipment.Description);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@Description", DBNull.Value);
+                    }
+                    if (equipment.ControlPanel != null)
+                    {
+                        command.Parameters.AddWithValue("@ControlPanel", equipment.ControlPanel);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@ControlPanel", DBNull.Value);
+                    }
+
                     connection.Open();
                     command.ExecuteNonQuery();
                 }

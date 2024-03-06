@@ -33,13 +33,18 @@ namespace Nitrogen_FrontEnd.Views
             {
                 txtFilePath.Text = openFileDialog.FileName;
             }
-
-            ExcelToSqlServer.ReadExcelFile();
         }
 
         public void HandleImportBtnClick(object sender, RoutedEventArgs e)
         {
-            ExcelToSqlServer.ReadExcelFile();
+            if (txtFilePath.Text != null)
+            {
+                ExcelService.ReadExcelFile(txtFilePath.Text);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Excelsheet Filepath");
+            }
         }
     }
 }
