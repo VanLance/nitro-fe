@@ -10,12 +10,45 @@ namespace Nitrogen_FrontEnd.Services
 {
     public class DatabaseService
     {
-        private string connectionString; // Connection string for your SQL Server database
+        private string connectionString;
 
         public DatabaseService(string connectionString)
         {
             this.connectionString = connectionString;
         }
+
+
+        public Project GetProjectByProjectNumber(string projectNumber)
+        {
+            Project project = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string projectQuery = "SELECT ProjectNumber, Description FROM Project WHERE ProjectNumber = @ProjectNumber";
+
+                using (SqlCommand command = new SqlCommand(projectQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@ProjectNumber", projectNumber);
+
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+
+                        project = new Project
+                        {
+                            ProjectNumber = reader["ProjectNumber"].ToString(),
+                            Description = reader["Description"].ToString(),
+
+                        };
+
+                    }
+                    return project;
+                }
+            }
+        }
+
 
         public List<Project> GetAllProjects()
         {
@@ -50,6 +83,28 @@ namespace Nitrogen_FrontEnd.Services
             return projects;
         }
 
+
+        public void AddProject(Project project)
+        {
+            if (GetProjectByProjectNumber(project.ProjectNumber) == null)
+            {
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+
+                    string insertQuery = "INSERT INTO Project (ProjectNumber, Description) VALUES (@ProjectNumber, @Description)";
+                    using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
+                        command.Parameters.AddWithValue("@Description", project.Description);
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
         public List<Equipment> GetEquipmentForProject(string projectNumber)
         {
             List<Equipment> equipmentList = new List<Equipment>();
@@ -62,7 +117,7 @@ namespace Nitrogen_FrontEnd.Services
                 {
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    while ( reader.Read() )
+                    while (reader.Read())
                     {
                         Equipment equipment = new Equipment
                         {
@@ -81,24 +136,6 @@ namespace Nitrogen_FrontEnd.Services
             }
 
             return equipmentList;
-        }
-
-        public void AddProject(Project project)
-        {
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-
-                string insertQuery = "INSERT INTO Project (ProjectNumber, Description) VALUES (@ProjectNumber, @Description)";
-                using (SqlCommand command = new SqlCommand(insertQuery, connection))
-                {
-
-                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
-                    command.Parameters.AddWithValue("@Description", project.Description);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
         }
 
         public void AddEquipment(Equipment equipment)

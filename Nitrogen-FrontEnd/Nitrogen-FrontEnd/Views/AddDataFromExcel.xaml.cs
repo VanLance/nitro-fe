@@ -38,7 +38,7 @@ namespace Nitrogen_FrontEnd.Views
 
         public void HandleImportBtnClick(object sender, RoutedEventArgs e)
         {
-            if (txtFilePath.Text != null)
+            if (txtFilePath.Text != "")
             {
                 excelService = new ExcelService(txtFilePath.Text);
                 excelService.ReadExcelFile();
