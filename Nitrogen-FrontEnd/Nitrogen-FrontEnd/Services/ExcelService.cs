@@ -108,15 +108,19 @@ namespace Nitrogen_FrontEnd
         private void AddEquipmentFromRow(Range usedRange, int row)
         {
             Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
-            if (equipCell.Value != null && DbService.GetEquipmentByIdAndProjectNumber(equipCell.Value.ToString(), ProjectNumber) == null )
+            if (equipCell.Value != null)
             {
-                Console.WriteLine(equipCell.Value.ToString());
-                Equipment equipment = CreateEquipmentFromRow(usedRange, row);
-                DbService.AddEquipment(equipment);
+                Dictionary<string, string> ids = ExtractIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
+                if (DbService.GetEquipmentByIdAndProjectNumber(ids, ProjectNumber) == null)
+                {
+                    Console.WriteLine(equipCell.Value.ToString());
+                    Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
+                    DbService.AddEquipment(equipment);
+                }
             }
         }
 
-        private Equipment CreateEquipmentFromRow(Range usedRange, int row)
+        private Equipment CreateEquipmentFromRow(Range usedRange, int row, Dictionary<string,string> ids)
         {
             Equipment equipment = new Equipment
             {
@@ -124,8 +128,14 @@ namespace Nitrogen_FrontEnd
                 Area = usedRange.Parent.Name,
             };
 
-            equipment.EquipmentId = usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString();
-            
+
+            equipment.EquipmentId = ids["id"];
+
+            if (ids.ContainsKey("subId"))
+            {
+                equipment.EquipmentSubId = ids["subId"];
+            };
+
             if (usedRange.Cells[row, ColumnNumbers["description"]].Value != null)
             {
                 equipment.Description = usedRange.Cells[row, ColumnNumbers["description"]].Value?.ToString();
@@ -136,6 +146,23 @@ namespace Nitrogen_FrontEnd
             }
 
             return equipment;
+        }
+
+        private Dictionary<string, string> ExtractIdAndSubId(string equipmentListNum)
+        {
+            string[] ids = equipmentListNum.Split('.');
+
+            Dictionary<string, string> idDict = new Dictionary<string, string>()
+            {
+                { "id" , ids[0] },
+            };
+
+            if (ids.Length > 1)
+            {
+                idDict.Add("subId", ids[1]);
+            };
+
+            return idDict;
         }
 
         private void ReleaseObject(object obj)

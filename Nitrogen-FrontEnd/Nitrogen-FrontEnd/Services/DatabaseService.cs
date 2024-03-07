@@ -124,6 +124,7 @@ namespace Nitrogen_FrontEnd.Services
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
                             EquipmentId = reader["EquipmentId"].ToString(),
+                            EquipmentSubId = reader["EquipmentSubId"].ToString(),
                             ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
                             Area = reader["Area"].ToString(),
                         };
@@ -138,18 +139,26 @@ namespace Nitrogen_FrontEnd.Services
             return equipmentList;
         }
 
-        public Equipment GetEquipmentByIdAndProjectNumber(string id, string projectNumber)
+        public Equipment GetEquipmentByIdAndProjectNumber(Dictionary<string,string> ids, string projectNumber)
         {
             Equipment equipment = null;
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string projectQuery = "SELECT * FROM Equipment WHERE ProjectNumber = @ProjectNumber and EquipmentId = @Id";
+                string projectQuery = "SELECT * FROM Equipment WHERE ProjectNumber = @ProjectNumber and EquipmentId = @Id and EquipmentSubId = @SubId";
 
                 using (SqlCommand command = new SqlCommand(projectQuery, connection))
                 {
                     command.Parameters.AddWithValue("@ProjectNumber", projectNumber);
-                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@Id", ids["id"]);
+                    if (ids.ContainsKey("subId"))
+                    {
+                        command.Parameters.AddWithValue("@SubId", ids["subId"]);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@SubId", DBNull.Value);
+                    }
 
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
@@ -176,9 +185,9 @@ namespace Nitrogen_FrontEnd.Services
             {
 
                 string insertQuery = "INSERT INTO Equipment (" +
-                            "ProjectNumber, Description, EquipmentId, ControlPanel, Area" +
+                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ControlPanel, Area" +
                         ") VALUES (" +
-                            "@ProjectNumber, @Description, @EquipmentId, @ControlPanel, @Area" +
+                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ControlPanel, @Area" +
                         ")";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
@@ -186,6 +195,15 @@ namespace Nitrogen_FrontEnd.Services
                     command.Parameters.AddWithValue("@ProjectNumber", equipment.ProjectNumber);
                     command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
                     command.Parameters.AddWithValue("@Area", equipment.Area);
+
+                    if (equipment.EquipmentSubId != null)
+                    {
+                        command.Parameters.AddWithValue("@EquipmentSubId", equipment.EquipmentSubId);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@EquipmentSubId", DBNull.Value);
+                    }
                     if (equipment.Description != null)
                     {
                         command.Parameters.AddWithValue("@Description", equipment.Description);
