@@ -108,7 +108,7 @@ namespace Nitrogen_FrontEnd
         private void AddEquipmentFromRow(Range usedRange, int row)
         {
             Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
-            if (equipCell.Value != null)
+            if (equipCell.Value != null && DbService.GetEquipmentByIdAndProjectNumber(equipCell.Value.ToString(), ProjectNumber) == null )
             {
                 Console.WriteLine(equipCell.Value.ToString());
                 Equipment equipment = CreateEquipmentFromRow(usedRange, row);
@@ -124,10 +124,8 @@ namespace Nitrogen_FrontEnd
                 Area = usedRange.Parent.Name,
             };
 
-            if (usedRange.Cells[row, ColumnNumbers["equip list #"]].Value != null)
-            {
-                equipment.EquipmentId = usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString();
-            }
+            equipment.EquipmentId = usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString();
+            
             if (usedRange.Cells[row, ColumnNumbers["description"]].Value != null)
             {
                 equipment.Description = usedRange.Cells[row, ColumnNumbers["description"]].Value?.ToString();

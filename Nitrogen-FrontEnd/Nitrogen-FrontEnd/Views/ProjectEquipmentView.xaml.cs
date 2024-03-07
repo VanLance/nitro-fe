@@ -19,7 +19,7 @@ namespace Nitrogen_FrontEnd.Views
     /// <summary>
     /// Interaction logic for ProjectEquipmentView.xaml
     /// </summary>
-    public partial class ProjectEquipmentView : Window
+    public partial class ProjectEquipmentView : Page
     {
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
@@ -31,7 +31,6 @@ namespace Nitrogen_FrontEnd.Views
 
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             ProjectNumber = projectNumber;
-            Console.Write(projectNumber + " ============== proj number");
 
             ShowEquipment();
         }
@@ -41,7 +40,7 @@ namespace Nitrogen_FrontEnd.Views
             try
             {
                 var equipmentDataList = databaseService.GetEquipmentForProject(ProjectNumber);
-                Console.Write(equipmentDataList.Count + " count ====");
+
                 equipmentList.ItemsSource = equipmentDataList;
                 equipmentList.SelectedValuePath = "Id";
                 equipmentList.AutoGenerateColumns = true;

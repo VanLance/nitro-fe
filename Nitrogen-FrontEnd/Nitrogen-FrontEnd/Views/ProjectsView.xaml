@@ -1,22 +1,23 @@
-﻿<Window
+﻿<Page
     x:Class="Nitrogen_FrontEnd.Views.ProjectsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:Nitrogen_FrontEnd.Views"
-    mc:Ignorable="d"
-    Title="ProjectsView"
-    Height="450"
-    Width="800">
-    <Grid>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid
+        Margin="10">
+
         <Label
             Content="Projects"
-            Margin="10,0,0,86"
-            HorizontalAlignment="Center"/>
+            Margin="10" />
         <DataGrid
             x:Name="projectList"
-            Margin="10,38,10,86" />
-        <Button Click="ViewProjectsEquipment_Click" Content="View Selected Project's Equipment" Height="20" Width="200"/>
+            Margin="0,38,0,86" />
+        <Button
+            Click="ViewProjectsEquipment_Click"
+            Content="View Selected Project's Equipment"
+            Height="20"
+            Width="200" />
     </Grid>
-</Window>
+
+</Page>
+

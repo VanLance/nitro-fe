@@ -18,7 +18,7 @@ namespace Nitrogen_FrontEnd.Views
     /// <summary>
     /// Interaction logic for AddDataFromExcel.xaml
     /// </summary>
-    public partial class AddDataFromExcel : Window
+    public partial class AddDataFromExcel : Page
     {
         ExcelService excelService;
         public AddDataFromExcel()

@@ -1,26 +1,15 @@
 ﻿using Nitrogen_FrontEnd.Services;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Nitrogen_FrontEnd.Views
 {
     /// <summary>
     /// Interaction logic for ProjectsView.xaml
     /// </summary>
-    public partial class ProjectsView : Window
+    public partial class ProjectsView : Page
     {
 
         private DatabaseService databaseService;
@@ -54,8 +43,7 @@ namespace Nitrogen_FrontEnd.Views
         {
             ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValuePath);
 
-            projectEquipmentView.Show();
-            this.Close();
+            NavigationService.Navigate(projectEquipmentView);
         }
 
     }

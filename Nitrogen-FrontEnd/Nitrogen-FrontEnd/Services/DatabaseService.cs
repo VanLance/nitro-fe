@@ -144,7 +144,7 @@ namespace Nitrogen_FrontEnd.Services
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string projectQuery = "SELECT * FROM Equipment WHERE ProjectNumber = @ProjectNumber and Id = @Id";
+                string projectQuery = "SELECT * FROM Equipment WHERE ProjectNumber = @ProjectNumber and EquipmentId = @Id";
 
                 using (SqlCommand command = new SqlCommand(projectQuery, connection))
                 {

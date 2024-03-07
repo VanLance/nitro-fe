@@ -1,39 +1,21 @@
-﻿<Window x:Class="Nitrogen_FrontEnd.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Nitrogen_FrontEnd"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+﻿<Window
+    x:Class="Nitrogen_FrontEnd.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:Nitrogen_FrontEnd.Controls"
+    mc:Ignorable="d"
+    Title="MainWindow"
+    Height="450"
+    Width="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
-        </Grid.RowDefinitions>
 
-        <TextBlock
-            Text="Welcome to Nitrogen Application"
-            HorizontalAlignment="Center"
-            Margin="0,20,0,0"
-            FontSize="20" />
+        <controls:Navigation
+            NavigationService="{Binding ElementName=MainFrame, Path=NavigationService}" />
 
-        <Button
-            Content="View Projects"
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            Margin="0,20,0,0"
-            Click="ViewProjects_Click" />
-
-        <Button
-            Content="Add Data from Excel"
-            Grid.Row="2"
-            HorizontalAlignment="Center"
-            Margin="0,20,0,0"
-            Click="AddDataFromExcel_Click" />
+        <Frame
+            x:Name="MainFrame"
+            NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
