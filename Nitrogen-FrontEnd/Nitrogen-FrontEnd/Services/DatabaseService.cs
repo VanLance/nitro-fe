@@ -139,7 +139,7 @@ namespace Nitrogen_FrontEnd.Services
             return equipmentList;
         }
 
-        public Equipment GetEquipmentByIdAndProjectNumber(Dictionary<string,string> ids, string projectNumber)
+        public Equipment GetEquipmentByIdsAndProjectNumber(string id, string subId, string projectNumber)
         {
             Equipment equipment = null;
 
@@ -150,10 +150,10 @@ namespace Nitrogen_FrontEnd.Services
                 using (SqlCommand command = new SqlCommand(projectQuery, connection))
                 {
                     command.Parameters.AddWithValue("@ProjectNumber", projectNumber);
-                    command.Parameters.AddWithValue("@Id", ids["id"]);
-                    if (ids.ContainsKey("subId"))
+                    command.Parameters.AddWithValue("@Id", id);
+                    if (subId != null)
                     {
-                        command.Parameters.AddWithValue("@SubId", ids["subId"]);
+                        command.Parameters.AddWithValue("@SubId", subId);
                     }
                     else
                     {
@@ -180,14 +180,15 @@ namespace Nitrogen_FrontEnd.Services
 
         public void AddEquipment(Equipment equipment)
         {
+            Equipment parentEquipment = GetEquipmentByIdsAndProjectNumber(equipment.EquipmentId, null, equipment.ProjectNumber);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
 
                 string insertQuery = "INSERT INTO Equipment (" +
-                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ControlPanel, Area" +
+                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ParentEquipmentId, ControlPanel, Area" +
                         ") VALUES (" +
-                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ControlPanel, @Area" +
+                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ParentEquipmentId, @ControlPanel, @Area" +
                         ")";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
@@ -203,6 +204,14 @@ namespace Nitrogen_FrontEnd.Services
                     else
                     {
                         command.Parameters.AddWithValue("@EquipmentSubId", DBNull.Value);
+                    }
+                    if (parentEquipment != null)
+                    {
+                        command.Parameters.AddWithValue("@ParentEquipmentId",parentEquipment.Id);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@ParentEquipmentId", DBNull.Value);
                     }
                     if (equipment.Description != null)
                     {

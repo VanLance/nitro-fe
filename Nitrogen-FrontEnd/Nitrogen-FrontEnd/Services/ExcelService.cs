@@ -110,8 +110,8 @@ namespace Nitrogen_FrontEnd
             Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
             if (equipCell.Value != null)
             {
-                Dictionary<string, string> ids = ExtractIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
-                if (DbService.GetEquipmentByIdAndProjectNumber(ids, ProjectNumber) == null)
+                Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
+                if (DbService.GetEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"]: null, ProjectNumber) == null)
                 {
                     Console.WriteLine(equipCell.Value.ToString());
                     Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
@@ -148,7 +148,7 @@ namespace Nitrogen_FrontEnd
             return equipment;
         }
 
-        private Dictionary<string, string> ExtractIdAndSubId(string equipmentListNum)
+        private Dictionary<string, string> ExtractEquipmentIdAndSubId(string equipmentListNum)
         {
             string[] ids = equipmentListNum.Split('.');
 
