@@ -101,6 +101,21 @@ namespace Nitrogen_FrontEnd.Services
             }
         }
 
+        public void EditProject(Project project)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
+                string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                { 
+                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
+                    command.Parameters.AddWithValue("@Description", project.Description);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
         public List<Equipment> GetEquipmentForProject(string projectNumber)
         {
@@ -257,6 +272,7 @@ namespace Nitrogen_FrontEnd.Services
 
         public void AddEquipment(Equipment equipment)
         {
+            //if(GetSingleEquipmentByIdsAndProjectNumber())
             Equipment parentEquipment = GetSingleEquipmentByIdsAndProjectNumber(equipment.EquipmentId, null, equipment.ProjectNumber);
 
             using (SqlConnection connection = new SqlConnection(connectionString))

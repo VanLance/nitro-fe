@@ -1,4 +1,5 @@
-﻿using Nitrogen_FrontEnd.Services;
+﻿using Nitrogen_FrontEnd.Models;
+using Nitrogen_FrontEnd.Services;
 using System;
 using System.Data.SqlClient;
 using System.Windows;
@@ -55,7 +56,17 @@ namespace Nitrogen_FrontEnd.Views
 
         private void EditProject_Click(object sender, RoutedEventArgs e)
         {
+            var selectedProjectNumber = projectList.SelectedValue;
+            if (selectedProjectNumber != null)
+            {
+                Project selectedProject = (Project)projectList.SelectedItem;
 
+                databaseService.EditProject(selectedProject);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Project");
+            }
         }
     }
 }
