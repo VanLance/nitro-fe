@@ -31,7 +31,7 @@
             Grid.Row="1" />
 
         <Button
-            Content="See Equipment Family"
+            Content="View Equipment Family"
             Click="ViewEquipmentFamily_Click"
             Height="30"
             Width="200"

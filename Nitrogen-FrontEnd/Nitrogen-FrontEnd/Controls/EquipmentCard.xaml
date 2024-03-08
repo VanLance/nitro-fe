@@ -36,22 +36,22 @@
                 Text="Equipment Details" />
             <TextBlock
                 Grid.Row="1"
-                Text="{Binding EquipmentId}" />
-            <TextBlock
-                Grid.Row="2"
-                Text="{Binding ProjectNumber}" />
-            <TextBlock
-                Grid.Row="3"
-                Text="{Binding Area}" />
+                Text="{Binding EquipmentId, StringFormat='Equipment Id: {0}'}" />
             <TextBlock
                 Grid.Row="4"
-                Text="{Binding EquipmentSubId}" />
+                Text="{Binding EquipmentSubId, StringFormat='Sub Id: {0}'}" />
             <TextBlock
                 Grid.Row="5"
-                Text="{Binding Description}" />
+                Text="{Binding Description, StringFormat='Description: {0}'}" />
+            <TextBlock
+                Grid.Row="2"
+                Text="{Binding ProjectNumber, StringFormat='Project Number: {0}'}" />
+            <TextBlock
+                Grid.Row="3"
+                Text="{Binding Area, StringFormat='Area: {0}'}" />
             <TextBlock
                 Grid.Row="6"
-                Text="{Binding ControlPanel}" />
+                Text="{Binding ControlPanel, StringFormat='Control Panel: {0}'}" />
         </Grid>
     </Border>
 </UserControl>

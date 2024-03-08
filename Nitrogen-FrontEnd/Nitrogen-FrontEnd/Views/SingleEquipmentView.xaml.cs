@@ -20,7 +20,7 @@ namespace Nitrogen_FrontEnd.Views
     /// <summary>
     /// Interaction logic for EquipmentView.xaml
     /// </summary>
-    public partial class SingleEquipmentView : Window
+    public partial class SingleEquipmentView : Page
     {
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");

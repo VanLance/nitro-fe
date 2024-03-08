@@ -52,5 +52,11 @@ namespace Nitrogen_FrontEnd.Views
                 MessageBox.Show(e.ToString());
             }
         }
+
+        private void ViewEquipmentCard_Click(object sender, RoutedEventArgs e)
+        {
+            SingleEquipmentView singleEquipmentView = new SingleEquipmentView((int)equipmentList.SelectedValue);
+            NavigationService.Navigate(singleEquipmentView);
+        }
     }
 }

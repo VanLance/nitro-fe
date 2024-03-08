@@ -2,7 +2,9 @@
 using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
 using System;
+using System.Windows;
 using System.Collections.Generic;
+using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd
 {
@@ -65,6 +67,7 @@ namespace Nitrogen_FrontEnd
             excelApp.Quit();
             ReleaseObject(workbook);
             ReleaseObject(excelApp);
+            MessageBox.Show("Complete");
         }
 
         private void FindProjectNumber(Range cell, Range usedRange)
