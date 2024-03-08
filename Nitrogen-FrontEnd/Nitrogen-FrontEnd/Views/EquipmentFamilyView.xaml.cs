@@ -1,4 +1,5 @@
-﻿using Nitrogen_FrontEnd.Services;
+﻿using Nitrogen_FrontEnd.Models;
+using Nitrogen_FrontEnd.Services;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -41,10 +42,10 @@ namespace Nitrogen_FrontEnd.Views
         {
             try
             {
-                var equipmentDataList = databaseService.GetEquipmentFamily(EquipmentId, ProjectNumber);
+                List<Equipment> equipmentDataList = databaseService.GetEquipmentFamily(EquipmentId, ProjectNumber);
 
                 equipmentList.ItemsSource = equipmentDataList;
-                equipmentList.SelectedValuePath = "Id";
+                equipmentList.SelectedValuePath = "EquipmentId";
                 equipmentList.AutoGenerateColumns = true;
             }
             catch (Exception e)
@@ -53,10 +54,20 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private void ViewEquipmentCard_Click(object sender, RoutedEventArgs e)
+        public void EditEquipment_Click(object sender, RoutedEventArgs e)
         {
-            SingleEquipmentView singleEquipmentView = new SingleEquipmentView((int)equipmentList.SelectedValue);
-            NavigationService.Navigate(singleEquipmentView);
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+            
+                databaseService.EditEquipment(selectedEquipment);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
         }
+
     }
 }

@@ -39,13 +39,23 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private void ViewProjectsEquipment_Click( object Sender, RoutedEventArgs e )
+        private void ViewProjectsEquipment_Click(object Sender, RoutedEventArgs e)
         {
-            
-            ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValue.ToString());
-
-            NavigationService.Navigate(projectEquipmentView);
+            var selectedProjectNumber = projectList.SelectedValue;
+            if (selectedProjectNumber != null)
+            {
+                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValue.ToString());
+                NavigationService.Navigate(projectEquipmentView);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Project");
+            }
         }
 
+        private void EditProject_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

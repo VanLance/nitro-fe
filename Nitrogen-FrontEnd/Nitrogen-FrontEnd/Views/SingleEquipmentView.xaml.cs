@@ -25,6 +25,7 @@ namespace Nitrogen_FrontEnd.Views
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         private int EquipmentId;
+        private Equipment equipment;
 
         public SingleEquipmentView(int equipmentId)
         {
@@ -33,14 +34,20 @@ namespace Nitrogen_FrontEnd.Views
             EquipmentId = equipmentId;
 
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            equipment = databaseService.GetSingleEquipmentById(EquipmentId);
+
             ShowEquipment();
         }
 
         private void ShowEquipment()
         {
-            Equipment equipment = databaseService.GetSingleEquipmentById(EquipmentId);
-
             equipmentCard.DataContext = equipment;
+        }
+
+        private void ViewEquipmentFamily_Click(object sender, RoutedEventArgs e)
+        {
+            EquipmentFamilyView equipmentFamilyView = new EquipmentFamilyView(equipment.EquipmentId.ToString(), equipment.ProjectNumber);
+            NavigationService.Navigate(equipmentFamilyView);
         }
     }
 }

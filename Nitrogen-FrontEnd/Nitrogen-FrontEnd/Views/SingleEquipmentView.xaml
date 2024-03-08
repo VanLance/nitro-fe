@@ -14,5 +14,12 @@
         <controls:EquipmentCard
             x:Name="equipmentCard"
             Margin="10" />
+        
+        <Button
+            Content="View Equipment Family"
+            Click="ViewEquipmentFamily_Click"
+            Height="30"
+            Width="200"
+            Grid.Row="2" />
     </Grid>
 </Page>
