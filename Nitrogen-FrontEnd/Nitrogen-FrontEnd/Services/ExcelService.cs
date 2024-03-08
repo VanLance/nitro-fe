@@ -111,7 +111,7 @@ namespace Nitrogen_FrontEnd
             if (equipCell.Value != null)
             {
                 Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
-                if (DbService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"]: null, ProjectNumber) == null)
+                if (DbService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"] : null, ProjectNumber) == null)
                 {
                     Console.WriteLine(equipCell.Value.ToString());
                     Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
@@ -120,16 +120,14 @@ namespace Nitrogen_FrontEnd
             }
         }
 
-        private Equipment CreateEquipmentFromRow(Range usedRange, int row, Dictionary<string,string> ids)
+        private Equipment CreateEquipmentFromRow(Range usedRange, int row, Dictionary<string, string> ids)
         {
             Equipment equipment = new Equipment
             {
                 ProjectNumber = ProjectNumber,
                 Area = usedRange.Parent.Name,
+                EquipmentId = ids["id"],
             };
-
-
-            equipment.EquipmentId = ids["id"];
 
             if (ids.ContainsKey("subId"))
             {
@@ -157,7 +155,7 @@ namespace Nitrogen_FrontEnd
                 { "id" , ids[0] },
             };
 
-            if (ids.Length > 1)
+            if (ids.Length > 1 && ids[1] != "0" && ids[1] != "00")
             {
                 idDict.Add("subId", ids[1]);
             };

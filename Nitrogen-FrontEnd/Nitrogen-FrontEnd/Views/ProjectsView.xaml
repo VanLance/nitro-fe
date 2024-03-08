@@ -5,19 +5,33 @@
 
     <Grid
         Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
 
         <Label
             Content="Projects"
-            Margin="10" />
+            Margin="10"
+            HorizontalAlignment="Center" />
+
         <DataGrid
             x:Name="projectList"
-            Margin="0,38,0,86" />
+            Margin="0,10,0,10"
+            Grid.Row="1" />
+
         <Button
             Click="ViewProjectsEquipment_Click"
             Content="View Selected Project's Equipment"
-            Height="20"
-            Width="200" />
+            Height="30"
+            Width="200"
+            Grid.Row="2" />
     </Grid>
+
 
 </Page>
 

@@ -37,7 +37,6 @@ namespace Nitrogen_FrontEnd.Services
                         {
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
-
                         };
 
                     }
@@ -67,7 +66,7 @@ namespace Nitrogen_FrontEnd.Services
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
                             EquipListFormatDef = reader["EquipListFormatDef"].ToString(),
-                            IoListFormatDef = reader["IoListFormatDef"].ToString()
+                            IoListFormatDef = reader["IoListFormatDef"].ToString(),
                         };
 
                         projects.Add(project);
@@ -105,7 +104,7 @@ namespace Nitrogen_FrontEnd.Services
         public List<Equipment> GetEquipmentForProject(string projectNumber)
         {
             List<Equipment> equipmentList = new List<Equipment>();
-
+            int count = 1;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string equipmentQuery = $"SELECT * From Equipment WHERE ProjectNumber = @ProjectNumber";
@@ -118,14 +117,17 @@ namespace Nitrogen_FrontEnd.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
+                        count++;
                         Equipment equipment = new Equipment
                         {
+                            Id = (int)reader["id"],
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
                             EquipmentId = reader["EquipmentId"].ToString(),
                             EquipmentSubId = reader["EquipmentSubId"].ToString(),
                             ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
                             Area = reader["Area"].ToString(),
+                            ParentEquipmentId = reader["ParentEquipmentId"] != DBNull.Value ? (int)reader["ParentEquipmentId"] : (int?)null,
                         };
 
                         equipmentList.Add(equipment);
@@ -136,6 +138,40 @@ namespace Nitrogen_FrontEnd.Services
             }
 
             return equipmentList;
+        }
+
+        public Equipment GetSingleEquipmentById(int id)
+        {
+            Equipment equipment = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipmentQuery = "Select * From Equipment WHERE Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(equipmentQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+
+                        equipment = new Equipment
+                        {
+                            Id = (int)reader["Id"],
+                            ProjectNumber = reader["ProjectNumber"].ToString(),
+                            EquipmentId = reader["EquipmentId"].ToString(),
+                            Area = reader["Area"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            ControlPanel = reader["ControlPanel"].ToString(),
+                        };
+
+                    }
+                    return equipment;
+                }
+            }
         }
 
         public Equipment GetSingleEquipmentByIdsAndProjectNumber(string id, string subId, string projectNumber)
@@ -167,8 +203,9 @@ namespace Nitrogen_FrontEnd.Services
 
                         equipment = new Equipment
                         {
+                            Id = (int)reader["Id"],
                             ProjectNumber = reader["ProjectNumber"].ToString(),
-
+                            EquipmentId = reader["EquipmentId"].ToString(),
                         };
 
                     }
@@ -195,6 +232,7 @@ namespace Nitrogen_FrontEnd.Services
                     {
                         Equipment equipment = new Equipment
                         {
+                            Id = (int)reader["id"],
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
                             EquipmentId = reader["EquipmentId"].ToString(),

@@ -14,9 +14,11 @@
         Background="LightGray">
         <Button
             Content="Add Data From Excel"
-            Click="AddData_Click" />
+            Click="AddData_Click" 
+            Margin="10 5"/>
         <Button
             Content="Projects View"
-            Click="Projects_Click" />
+            Click="Projects_Click" 
+            Margin="10 5"/>
     </StackPanel>
 </UserControl>

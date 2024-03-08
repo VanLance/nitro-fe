@@ -19,12 +19,13 @@ namespace Nitrogen_FrontEnd.Views
     /// <summary>
     /// Interaction logic for EquipmentFamilyView.xaml
     /// </summary>
-    public partial class EquipmentFamilyView : Window
+    public partial class EquipmentFamilyView : Page
     {
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         private string ProjectNumber;
         private string EquipmentId;
+
         public EquipmentFamilyView(string equipmentId, string projectNumber)
         {
             InitializeComponent();

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Nitrogen_FrontEnd.Models;
+using Nitrogen_FrontEnd.Services;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,9 +22,25 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class SingleEquipmentView : Window
     {
-        public EquipmentView()
+        private DatabaseService databaseService;
+        public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        private int EquipmentId;
+
+        public SingleEquipmentView(int equipmentId)
         {
             InitializeComponent();
+
+            EquipmentId = equipmentId;
+
+            databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            ShowEquipment();
+        }
+
+        private void ShowEquipment()
+        {
+            Equipment equipment = databaseService.GetSingleEquipmentById(EquipmentId);
+
+            equipmentCard.DataContext = equipment;
         }
     }
 }

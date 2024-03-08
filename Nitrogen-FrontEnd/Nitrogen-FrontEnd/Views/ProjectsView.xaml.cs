@@ -41,7 +41,8 @@ namespace Nitrogen_FrontEnd.Views
 
         private void ViewProjectsEquipment_Click( object Sender, RoutedEventArgs e )
         {
-            ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValuePath);
+            
+            ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValue.ToString());
 
             NavigationService.Navigate(projectEquipmentView);
         }

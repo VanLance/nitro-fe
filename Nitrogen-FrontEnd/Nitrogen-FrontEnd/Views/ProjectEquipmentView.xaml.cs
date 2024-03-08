@@ -42,13 +42,19 @@ namespace Nitrogen_FrontEnd.Views
                 var equipmentDataList = databaseService.GetEquipmentForProject(ProjectNumber);
 
                 equipmentList.ItemsSource = equipmentDataList;
-                equipmentList.SelectedValuePath = "Id";
+                equipmentList.SelectedValuePath = "EquipmentId";
                 equipmentList.AutoGenerateColumns = true;
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
+        }
+
+        private void ViewEquipmentFamily_Click(object sender, RoutedEventArgs e)
+        {
+            EquipmentFamilyView equipmentFamilyView = new EquipmentFamilyView(equipmentList.SelectedValue.ToString(), ProjectNumber);
+            NavigationService.Navigate(equipmentFamilyView);
         }
     }
 }
