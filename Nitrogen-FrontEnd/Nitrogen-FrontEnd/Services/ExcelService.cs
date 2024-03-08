@@ -111,7 +111,7 @@ namespace Nitrogen_FrontEnd
             if (equipCell.Value != null)
             {
                 Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
-                if (DbService.GetEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"]: null, ProjectNumber) == null)
+                if (DbService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"]: null, ProjectNumber) == null)
                 {
                     Console.WriteLine(equipCell.Value.ToString());
                     Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);

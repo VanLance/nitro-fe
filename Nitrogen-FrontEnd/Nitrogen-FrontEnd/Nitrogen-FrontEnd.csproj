@@ -123,6 +123,12 @@
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
       <DependentUpon>AddDataFromExcel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EquipmentFamilyView.xaml.cs">
+      <DependentUpon>EquipmentFamilyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SingleEquipmentView.xaml.cs">
+      <DependentUpon>SingleEquipmentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ProjectEquipmentView.xaml.cs">
       <DependentUpon>ProjectEquipmentView.xaml</DependentUpon>
     </Compile>
@@ -146,6 +152,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\AddDataFromExcel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EquipmentFamilyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SingleEquipmentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
