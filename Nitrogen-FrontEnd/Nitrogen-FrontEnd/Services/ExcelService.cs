@@ -77,7 +77,6 @@ namespace Nitrogen_FrontEnd
                 string checkString = cell.Value.ToString().Substring(0, 9);
                 if (checkString.ToLower() == "project #")
                 {
-                    Console.WriteLine("------------ Found Project -------------------");
                     ProjectNumber = cell.Value.ToString().Substring(10);
 
                     Project project = new Project
@@ -93,13 +92,17 @@ namespace Nitrogen_FrontEnd
 
         private void AddColumnNumbers(Range cell)
         {
-            string cellValue = cell.Value.ToString().ToLower();
-
+            string cellValue = cell.Value.ToString().Trim().ToLower();
+            Console.WriteLine(cellValue, "=================================== cell value ");
             switch (cellValue)
             {
+                case "comments":
+                    ColumnNumbers["notes"] = cell.Column;
+                    break;
                 case "equip list #":
                 case "associated control panel":
                 case "description":
+                case "notes":
                     if (!ColumnNumbers.ContainsKey(cellValue))
                     {
                         ColumnNumbers[cellValue] = cell.Column;
@@ -144,6 +147,10 @@ namespace Nitrogen_FrontEnd
             if (usedRange.Cells[row, ColumnNumbers["associated control panel"]].Value != null)
             {
                 equipment.ControlPanel = usedRange.Cells[row, ColumnNumbers["associated control panel"]]?.Value.ToString();
+            }
+            if (usedRange.Cells[row, ColumnNumbers["notes"]].Value != null)
+            {
+                equipment.Notes = usedRange.Cells[row, ColumnNumbers["notes"]]?.Value.ToString();
             }
 
             return equipment;

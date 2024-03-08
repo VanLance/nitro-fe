@@ -127,6 +127,7 @@ namespace Nitrogen_FrontEnd.Services
                             EquipmentSubId = reader["EquipmentSubId"].ToString(),
                             ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
                             Area = reader["Area"].ToString(),
+                            Notes = reader["Notes"].ToString(),
                             ParentEquipmentId = reader["ParentEquipmentId"] != DBNull.Value ? (int)reader["ParentEquipmentId"] : (int?)null,
                         };
 
@@ -166,6 +167,7 @@ namespace Nitrogen_FrontEnd.Services
                             Area = reader["Area"].ToString(),
                             Description = reader["Description"].ToString(),
                             ControlPanel = reader["ControlPanel"].ToString(),
+                            Notes = reader["Notes"].ToString(),
                         };
 
                     }
@@ -239,6 +241,7 @@ namespace Nitrogen_FrontEnd.Services
                             EquipmentSubId = reader["EquipmentSubId"].ToString(),
                             ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
                             Area = reader["Area"].ToString(),
+                            Notes = reader["Notes"].ToString(),
                         };
 
                         equipmentList.Add(equipment);
@@ -258,9 +261,9 @@ namespace Nitrogen_FrontEnd.Services
             {
 
                 string insertQuery = "INSERT INTO Equipment (" +
-                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ParentEquipmentId, ControlPanel, Area" +
+                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ParentEquipmentId, ControlPanel, Area, Notes" +
                         ") VALUES (" +
-                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ParentEquipmentId, @ControlPanel, @Area" +
+                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ParentEquipmentId, @ControlPanel, @Area, @Notes" +
                         ")";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
@@ -270,6 +273,7 @@ namespace Nitrogen_FrontEnd.Services
                     command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
                     command.Parameters.AddWithValue("@Area", equipment.Area);
                     command.Parameters.AddWithValue("@EquipmentSubId", (object)equipment.EquipmentSubId ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@Notes", (object)equipment.Notes ?? DBNull.Value);
                     command.Parameters.AddWithValue("@ParentEquipmentId", parentEquipment?.Id != null ? (object)parentEquipment.Id : DBNull.Value);
                     command.Parameters.AddWithValue("@ControlPanel", (object)equipment.ControlPanel ?? DBNull.Value);
 
