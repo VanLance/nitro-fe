@@ -21,5 +21,6 @@ namespace Nitrogen_FrontEnd.Models
         public string ModelNumber { get; set; }
         public int VendorId { get; set; }
         public int UserDefinitionId { get; set; }
+        public int ExcelRowNumber { get; set; }
     }
 }

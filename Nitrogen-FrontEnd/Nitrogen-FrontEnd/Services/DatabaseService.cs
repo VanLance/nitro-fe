@@ -347,9 +347,9 @@ namespace Nitrogen_FrontEnd.Services
             {
 
                 string insertQuery = "INSERT INTO Equipment (" +
-                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ParentEquipmentId, ControlPanel, Area, Notes" +
+                            "ProjectNumber, Description, EquipmentId, EquipmentSubId, ParentEquipmentId, ControlPanel, Area, Notes, ExcelRowNumber" +
                         ") VALUES (" +
-                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ParentEquipmentId, @ControlPanel, @Area, @Notes" +
+                            "@ProjectNumber, @Description, @EquipmentId, @EquipmentSubId, @ParentEquipmentId, @ControlPanel, @Area, @Notes, @ExcelRowNumber" +
                         ")";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
@@ -362,6 +362,7 @@ namespace Nitrogen_FrontEnd.Services
                     command.Parameters.AddWithValue("@Notes", (object)equipment.Notes ?? DBNull.Value);
                     command.Parameters.AddWithValue("@ParentEquipmentId", parentEquipment?.Id != null ? (object)parentEquipment.Id : DBNull.Value);
                     command.Parameters.AddWithValue("@ControlPanel", (object)equipment.ControlPanel ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@ExcelRowNumber", equipment.ExcelRowNumber);
 
                     connection.Open();
                     command.ExecuteNonQuery();

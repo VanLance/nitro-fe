@@ -194,6 +194,7 @@ namespace Nitrogen_FrontEnd
                 ProjectNumber = ProjectNumber,
                 Area = usedRange.Parent.Name,
                 EquipmentId = ids["id"],
+                ExcelRowNumber = row,
             };
 
             if (ids.ContainsKey("subId"))
