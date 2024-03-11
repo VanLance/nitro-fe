@@ -52,7 +52,7 @@ namespace Nitrogen_FrontEnd.Services
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "SELECT ProjectNumber, Description, EquipListFormatDef, IoListFormatDef FROM Project";
+                string query = "SELECT ProjectNumber, Description, EquipSheetFormatId, IoSheetFormatId FROM Project";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -65,8 +65,8 @@ namespace Nitrogen_FrontEnd.Services
                         {
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
-                            EquipSheetFormatId = (int)reader["EquipListFormatDef"],
-                            IoSheetFormatId = (int)reader["IoListFormatDef"],
+                            EquipSheetFormatId = (int)reader["EquipSheetFormatId"],
+                            IoSheetFormatId = (int)reader["IoSheetFormatId"],
                         };
 
                         projects.Add(project);
