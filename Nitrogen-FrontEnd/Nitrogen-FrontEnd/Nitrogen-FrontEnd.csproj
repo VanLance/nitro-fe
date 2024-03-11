@@ -123,6 +123,8 @@
     <Compile Include="Controls\Navigation.xaml.cs">
       <DependentUpon>Navigation.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\EquipDbFieldToExcelColumnMap.cs" />
+    <Compile Include="Models\EquipSheetFormat.cs" />
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
       <DependentUpon>AddDataFromExcel.xaml</DependentUpon>
     </Compile>

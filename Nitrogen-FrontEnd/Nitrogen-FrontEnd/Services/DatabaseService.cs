@@ -65,8 +65,8 @@ namespace Nitrogen_FrontEnd.Services
                         {
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
-                            EquipListFormatDef = reader["EquipListFormatDef"].ToString(),
-                            IoListFormatDef = reader["IoListFormatDef"].ToString(),
+                            EquipSheetFormatId = (int)reader["EquipListFormatDef"],
+                            IoSheetFormatId = (int)reader["IoListFormatDef"],
                         };
 
                         projects.Add(project);
@@ -82,21 +82,89 @@ namespace Nitrogen_FrontEnd.Services
 
         public void AddProject(Project project)
         {
-            if (GetProjectByProjectNumber(project.ProjectNumber) == null)
+            if (GetProjectByProjectNumber(project.ProjectNumber) != null) return;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                string insertQuery = "INSERT INTO Project (ProjectNumber, Description, EquipSheetFormatId) VALUES (@ProjectNumber, @Description, @EquipSheetFormatId)";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
 
-                    string insertQuery = "INSERT INTO Project (ProjectNumber, Description) VALUES (@ProjectNumber, @Description)";
-                    using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
+                    command.Parameters.AddWithValue("@Description", project.Description);
+                    command.Parameters.AddWithValue("@EquipSheetFormatId", project.EquipSheetFormatId);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+
+        }
+
+
+        public EquipDbFieldToExcelColumnMap GetEquipDbToExcelMap(string equipListNumber)
+        {
+            EquipDbFieldToExcelColumnMap equipDbFieldToExcelColumnMap = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipDbFieldToExcelColumnMapQuery = "SELECT * FROM EquipDbFieldToExcelColumnMap WHERE EquipListNumber = @EquipListNumber";
+
+                using (SqlCommand command = new SqlCommand(equipDbFieldToExcelColumnMapQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EquipListNumber", equipListNumber);
+
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.Read())
                     {
 
-                        command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
-                        command.Parameters.AddWithValue("@Description", project.Description);
-                        connection.Open();
-                        command.ExecuteNonQuery();
+                        equipDbFieldToExcelColumnMap = new EquipDbFieldToExcelColumnMap
+                        {
+                            EquipListNumber = (int)reader["EquipListNumber"],
+                        };
+
                     }
+                    return equipDbFieldToExcelColumnMap;
+                }
+            }
+        }
+        public int AddEquipDbFieldToExcelColumnMap(EquipDbFieldToExcelColumnMap dbToExcelMap)
+        {
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
+                string insertQuery = "INSERT INTO EquipDbFieldToExcelColumnMap (EquipListNumber, Description, ControlPanel, Notes) OUTPUT INSERTED.Id VALUES (@EquipListNumber, @Description, @ControlPanel, @Notes)";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EquipListNumber", dbToExcelMap.EquipListNumber);
+                    command.Parameters.AddWithValue("@Description", dbToExcelMap.Description);
+                    command.Parameters.AddWithValue("@ControlPanel", dbToExcelMap.ControlPanel);
+                    command.Parameters.AddWithValue("@Notes", dbToExcelMap.Notes);
+                    connection.Open();
+                    return (int)command.ExecuteScalar();
+                }
+            }
+        }
+
+        public int AddEquipSheetFormat(EquipSheetFormat sheetFormat)
+        {
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
+                string insertQuery = "INSERT INTO EquipSheetFormat (FileName, StartingDataLine, EquipDbFieldToExcelColumnMapId ) OUTPUT INSERTED.Id VALUES (@FileName, @StartingDataLine, @EquipDbFieldToExcelColumnMapId)";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                {
+
+                    command.Parameters.AddWithValue("@FileName", sheetFormat.FileName);
+                    command.Parameters.AddWithValue("@StartingDataLine", sheetFormat.StartingDataLine);
+                    command.Parameters.AddWithValue("@EquipDbFieldToExcelColumnMapId", sheetFormat.EquipDbFieldToExcelColumnMapId);
+
+                    connection.Open();
+                    return (int)command.ExecuteScalar();
                 }
             }
         }
@@ -108,7 +176,7 @@ namespace Nitrogen_FrontEnd.Services
 
                 string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
-                { 
+                {
                     command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
                     command.Parameters.AddWithValue("@Description", project.Description);
                     connection.Open();
@@ -120,7 +188,7 @@ namespace Nitrogen_FrontEnd.Services
         public List<Equipment> GetEquipmentForProject(string projectNumber)
         {
             List<Equipment> equipmentList = new List<Equipment>();
-            int count = 1;
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string equipmentQuery = $"SELECT * From Equipment WHERE ProjectNumber = @ProjectNumber";
@@ -133,7 +201,7 @@ namespace Nitrogen_FrontEnd.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        count++;
+
                         Equipment equipment = new Equipment
                         {
                             Id = (int)reader["id"],

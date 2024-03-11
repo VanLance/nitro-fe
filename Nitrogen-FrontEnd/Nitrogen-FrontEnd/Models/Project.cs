@@ -10,7 +10,7 @@ namespace Nitrogen_FrontEnd.Models
     {
         public string ProjectNumber { get; set; }
         public string Description { get; set; }
-        public string EquipListFormatDef { get; set; }
-        public string IoListFormatDef { get; set; }
+        public int EquipSheetFormatId { get; set; }
+        public int IoSheetFormatId { get; set; }
     }
 }

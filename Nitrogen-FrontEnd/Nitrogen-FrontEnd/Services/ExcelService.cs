@@ -12,13 +12,13 @@ namespace Nitrogen_FrontEnd
     {
         private string FilePath;
         static private DatabaseService DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-        private Dictionary<string, int> ColumnNumbers;
         private string ProjectNumber;
+        private Project project;
+        private Dictionary<string, int> ColumnNumbers = new Dictionary<string, int>();
 
         public ExcelService(string filePath)
         {
             FilePath = filePath;
-            ColumnNumbers = new Dictionary<string, int>();
         }
 
         public void ReadExcelFile()
@@ -48,7 +48,15 @@ namespace Nitrogen_FrontEnd
                                     {
                                         FindProjectNumber(cell, usedRange);
                                     }
-                                    AddColumnNumbers(cell);
+                                    else
+                                    {
+                                        if (ProjectInDb())
+                                        {
+                                            MessageBox.Show("Project Already Added!");
+                                            return;
+                                        }
+                                        AddColumnNumbers(cell, columnCount);
+                                    }
                                 }
                             }
                         }
@@ -58,8 +66,6 @@ namespace Nitrogen_FrontEnd
                         }
                     }
 
-                    foreach (var entry in ColumnNumbers)
-                        Console.WriteLine($"{entry.Key} {entry.Value}");
                     ReleaseObject(worksheet);
                 }
             }
@@ -79,21 +85,26 @@ namespace Nitrogen_FrontEnd
                 {
                     ProjectNumber = cell.Value.ToString().Substring(10);
 
-                    Project project = new Project
+                    project = new Project
                     {
                         ProjectNumber = cell.Value.ToString().Substring(10),
                         Description = usedRange.Cells[cell.Row - 2, cell.Column].Value.ToString(),
                     };
 
-                    DbService.AddProject(project);
                 }
             }
         }
 
-        private void AddColumnNumbers(Range cell)
+        private bool ProjectInDb()
         {
+            return DbService.GetProjectByProjectNumber(project.ProjectNumber) != null;
+        }
+
+        private void AddColumnNumbers(Range cell, int columnCount)
+        {
+
             string cellValue = cell.Value.ToString().Trim().ToLower();
-            Console.WriteLine(cellValue, "=================================== cell value ");
+
             switch (cellValue)
             {
                 case "comments":
@@ -109,6 +120,56 @@ namespace Nitrogen_FrontEnd
                     }
                     break;
             }
+            if (cell.Column == columnCount - 1)
+            {
+
+                int dbExcelMapPk = AddEquipDbExcelMap();
+
+                int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
+
+                project.EquipSheetFormatId = sheetFormatPk;
+                DbService.AddProject(project);
+
+            }
+        }
+
+        private int AddEquipDbExcelMap()
+        {
+            EquipDbFieldToExcelColumnMap dbToExcelMap = new EquipDbFieldToExcelColumnMap();
+            foreach (var entry in ColumnNumbers)
+            {
+                switch (entry.Key)
+                {
+                    case "notes":
+                    case "comments":
+                        dbToExcelMap.Notes = entry.Value;
+                        break;
+                    case "equip list #":
+                        dbToExcelMap.EquipListNumber = entry.Value;
+                        break;
+                    case "associated control panel":
+                        dbToExcelMap.ControlPanel = entry.Value;
+                        break;
+                    case "description":
+                        dbToExcelMap.Description = entry.Value;
+                        break;
+                }
+            }
+            int dbExcelMapPk = DbService.AddEquipDbFieldToExcelColumnMap(dbToExcelMap);
+            return dbExcelMapPk;
+        }
+
+        private int AddEquipSheetFormat(Range cell, int dbExcelMapPk)
+        {
+            EquipSheetFormat sheetFormat = new EquipSheetFormat()
+            {
+                FileName = FilePath,
+                StartingDataLine = cell.Row + 1,
+                EquipDbFieldToExcelColumnMapId = dbExcelMapPk,
+            };
+
+            int sheetFormatPK = DbService.AddEquipSheetFormat(sheetFormat);
+            return sheetFormatPK;
         }
 
         private void AddEquipmentFromRow(Range usedRange, int row)
