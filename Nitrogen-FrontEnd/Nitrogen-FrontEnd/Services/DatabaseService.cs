@@ -21,7 +21,7 @@ namespace Nitrogen_FrontEnd.Services
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string projectQuery = "SELECT ProjectNumber, Description FROM Project WHERE ProjectNumber = @ProjectNumber";
+                string projectQuery = "SELECT * FROM Project WHERE ProjectNumber = @ProjectNumber";
 
                 using (SqlCommand command = new SqlCommand(projectQuery, connection))
                 {
@@ -37,6 +37,8 @@ namespace Nitrogen_FrontEnd.Services
                         {
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
+                            EquipSheetFormatId = (int)reader["EquipSheetFormatId"],
+                            IoSheetFormatId = reader["IoSheetFormatID"] != DBNull.Value ? (int)reader["IoSheetFormatId"] : (int?)null,
                         };
 
                     }
@@ -66,7 +68,7 @@ namespace Nitrogen_FrontEnd.Services
                             ProjectNumber = reader["ProjectNumber"].ToString(),
                             Description = reader["Description"].ToString(),
                             EquipSheetFormatId = (int)reader["EquipSheetFormatId"],
-                            IoSheetFormatId = (int)reader["IoSheetFormatId"],
+                            IoSheetFormatId = reader["IoSheetFormatID"] != DBNull.Value ? (int)reader["IoSheetFormatId"] : (int?)null,
                         };
 
                         projects.Add(project);
@@ -130,6 +132,56 @@ namespace Nitrogen_FrontEnd.Services
                 }
             }
         }
+
+        public void EditProject(Project project)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
+                string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
+                    command.Parameters.AddWithValue("@Description", project.Description);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public EquipDbFieldToExcelColumnMap GetEquipDbToExcelMapById(int Id)
+        {
+            EquipDbFieldToExcelColumnMap equipMap = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipmentQuery = "Select * From EquipDbFieldToExcelColumnMap WHERE Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(equipmentQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", Id);
+
+                    connection.Open();
+
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+
+                        equipMap = new EquipDbFieldToExcelColumnMap
+                        {
+                            Id = (int)reader["Id"],
+                            EquipListNumber = (int)reader["EquipListNumber"],
+                            Description = (int)reader["Description"],
+                            ControlPanel = (int)reader["ControlPanel"],
+                            Notes = (int)reader["Notes"],
+                        };
+
+                    }
+                    return equipMap;
+                }
+            }
+        }
+
         public int AddEquipDbFieldToExcelColumnMap(EquipDbFieldToExcelColumnMap dbToExcelMap)
         {
 
@@ -145,6 +197,39 @@ namespace Nitrogen_FrontEnd.Services
                     command.Parameters.AddWithValue("@Notes", dbToExcelMap.Notes);
                     connection.Open();
                     return (int)command.ExecuteScalar();
+                }
+            }
+        }
+
+        public EquipSheetFormat GetSheetFormatById(int Id)
+        {
+            EquipSheetFormat sheetFormat = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipmentQuery = "Select * From EquipSheetFormat WHERE Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(equipmentQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", Id);
+
+                    connection.Open();
+
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+
+                        sheetFormat = new EquipSheetFormat
+                        {
+                            Id = (int)reader["Id"],
+                            FileName = reader["FileName"].ToString(),
+                            StartingDataLine = (int)reader["StartingDataLine"],
+                            EquipDbFieldToExcelColumnMapId = (int)reader["EquipDbFieldToExcelColumnMapId"],
+
+                        };
+
+                    }
+                    return sheetFormat;
                 }
             }
         }
@@ -169,21 +254,6 @@ namespace Nitrogen_FrontEnd.Services
             }
         }
 
-        public void EditProject(Project project)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-
-                string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
-                using (SqlCommand command = new SqlCommand(insertQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
-                    command.Parameters.AddWithValue("@Description", project.Description);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
 
         public List<Equipment> GetEquipmentForProject(string projectNumber)
         {
@@ -213,6 +283,7 @@ namespace Nitrogen_FrontEnd.Services
                             Area = reader["Area"].ToString(),
                             Notes = reader["Notes"].ToString(),
                             ParentEquipmentId = reader["ParentEquipmentId"] != DBNull.Value ? (int)reader["ParentEquipmentId"] : (int?)null,
+                            ExcelRowNumber = (int)reader["ExcelRowNumber"]
                         };
 
                         equipmentList.Add(equipment);
@@ -253,6 +324,7 @@ namespace Nitrogen_FrontEnd.Services
                             Description = reader["Description"].ToString(),
                             ControlPanel = reader["ControlPanel"].ToString(),
                             Notes = reader["Notes"].ToString(),
+                            ExcelRowNumber = (int)reader["ExcelRowNumber"]
                         };
 
                     }
@@ -327,6 +399,7 @@ namespace Nitrogen_FrontEnd.Services
                             ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
                             Area = reader["Area"].ToString(),
                             Notes = reader["Notes"].ToString(),
+                            ExcelRowNumber = (int)reader["ExcelRowNumber"]
                         };
 
                         equipmentList.Add(equipment);

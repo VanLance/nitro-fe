@@ -8,7 +8,7 @@ using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd
 {
-    class ExcelService
+    class ExcelReader
     {
         private string FilePath;
         static private DatabaseService DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
@@ -16,7 +16,7 @@ namespace Nitrogen_FrontEnd
         private Project project;
         private Dictionary<string, int> ColumnNumbers = new Dictionary<string, int>();
 
-        public ExcelService(string filePath)
+        public ExcelReader(string filePath)
         {
             FilePath = filePath;
         }

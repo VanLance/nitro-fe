@@ -24,6 +24,8 @@ namespace Nitrogen_FrontEnd.Views
     {
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        private ExcelWriter ExcelWriter;
+        private EquipSheetFormat SheetFormat;
         private string ProjectNumber;
         private string EquipmentId;
 
@@ -34,6 +36,7 @@ namespace Nitrogen_FrontEnd.Views
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             ProjectNumber = projectNumber;
             EquipmentId = equipmentId;
+            ExcelWriter = GenerateExcelWriter();
 
             ShowEquipmentFamily();
         }
@@ -54,7 +57,17 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        public void EditEquipment_Click(object sender, RoutedEventArgs e)
+        private ExcelWriter GenerateExcelWriter()
+        {
+            ExcelWriter excelWriter = null;
+
+            Project project = databaseService.GetProjectByProjectNumber(ProjectNumber);
+            SheetFormat = databaseService.GetSheetFormatById(project.EquipSheetFormatId);
+            excelWriter = new ExcelWriter(SheetFormat.FileName);
+            return excelWriter;
+        }
+
+        public void UpdateDb_Click(object sender, RoutedEventArgs e)
         {
             object selectedId = equipmentList.SelectedValue;
             if (selectedId != null)
@@ -62,6 +75,23 @@ namespace Nitrogen_FrontEnd.Views
                 Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
             
                 databaseService.EditEquipment(selectedEquipment);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
+        }
+
+        public void UpdateExcel_Click(object sender, RoutedEventArgs e)
+        {
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+                Console.WriteLine(SheetFormat.EquipDbFieldToExcelColumnMapId.ToString() + " sheet fromat map fk");
+                EquipDbFieldToExcelColumnMap equipmentMap = databaseService.GetEquipDbToExcelMapById(SheetFormat.EquipDbFieldToExcelColumnMapId);
+                Console.WriteLine(equipmentMap.Id.ToString() + " map pk");
+                ExcelWriter.WriteDataToExcelRow(selectedEquipment, equipmentMap);
             }
             else
             {
