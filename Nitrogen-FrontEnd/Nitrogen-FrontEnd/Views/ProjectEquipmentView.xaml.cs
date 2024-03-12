@@ -24,6 +24,8 @@ namespace Nitrogen_FrontEnd.Views
     {
         private DatabaseService databaseService;
         public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        private ExcelWriter ExcelWriter;
+        private EquipSheetFormat SheetFormat;
         private string ProjectNumber;
 
         public ProjectEquipmentView(string projectNumber)
@@ -32,7 +34,7 @@ namespace Nitrogen_FrontEnd.Views
 
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             ProjectNumber = projectNumber;
-
+            ExcelWriter = GenerateExcelWriter();
             ShowEquipment();
         }
 
@@ -50,7 +52,17 @@ namespace Nitrogen_FrontEnd.Views
             {
                 MessageBox.Show(e.ToString());
             }
-        } 
+        }
+
+        private ExcelWriter GenerateExcelWriter()
+        {
+            ExcelWriter excelWriter = null;
+
+            Project project = databaseService.GetProjectByProjectNumber(ProjectNumber);
+            SheetFormat = databaseService.GetSheetFormatById(project.EquipSheetFormatId);
+            excelWriter = new ExcelWriter(SheetFormat.FileName);
+            return excelWriter;
+        }
 
         private void ViewEquipmentCard_Click(object sender, RoutedEventArgs e)
         {
@@ -66,7 +78,7 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        public void EditEquipment_Click(object sender, RoutedEventArgs e)
+        public void UpdateDatabase_Click(object sender, RoutedEventArgs e)
         {
             object selectedId = equipmentList.SelectedValue;
             if (selectedId != null)
@@ -74,6 +86,23 @@ namespace Nitrogen_FrontEnd.Views
                 Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
 
                 databaseService.EditEquipment(selectedEquipment);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
+        }
+
+        public void UpdateExcel_Click(object sender, RoutedEventArgs e)
+        {
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+
+                EquipDbFieldToExcelColumnMap equipmentMap = databaseService.GetEquipDbToExcelMapById(SheetFormat.EquipDbFieldToExcelColumnMapId);
+
+                ExcelWriter.WriteDataToExcelRow(selectedEquipment, equipmentMap);
             }
             else
             {

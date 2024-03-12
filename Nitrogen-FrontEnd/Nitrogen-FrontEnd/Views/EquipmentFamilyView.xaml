@@ -52,7 +52,7 @@
             Grid.Row="3" />
 
         <Button
-            Content="Update Excel"
+            Content="Update Spreadsheet"
             Click="UpdateExcel_Click"
             Height="30"
             Width="100"

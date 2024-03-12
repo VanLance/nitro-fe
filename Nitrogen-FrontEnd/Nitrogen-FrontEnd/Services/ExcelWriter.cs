@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using Nitrogen_FrontEnd.Models;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using Application = Microsoft.Office.Interop.Excel.Application;
 
@@ -10,31 +11,33 @@ namespace Nitrogen_FrontEnd.Services
     {
         private string FilePath;
         static private DatabaseService DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        private Application ExcelApp;
+        private Workbook Workbook;
 
         public ExcelWriter(string filePath)
         {
             FilePath = filePath;
+            ExcelApp = new Application();
+            Workbook = ExcelApp.Workbooks.Open(FilePath);
         }
 
         public void WriteDataToExcelRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
         {
             //try
             //{
-            Console.WriteLine(equipment.Area + "AREA ==============");
-            Application excelApp = new Application();
-            Workbook workbook = excelApp.Workbooks.Open(FilePath);
-            //Worksheet worksheet = workbook.Worksheets[equipment.Area];
 
-            Worksheet worksheet = null;
-            foreach (Worksheet ws in workbook.Worksheets)
-            {
-                Console.WriteLine(ws.Name + "worksheet Name");
-                if (ws.Name == equipment.Area)
-                {
-                    worksheet = ws;
-                    break;
-                }
-            }
+            Worksheet worksheet = Workbook.Worksheets[equipment.Area];
+
+            //Worksheet worksheet = null;
+            //foreach (Worksheet ws in workbook.Worksheets)
+            //{
+            //    Console.WriteLine(ws.Name + "worksheet Name");
+            //    if (ws.Name == equipment.Area)
+            //    {
+            //        worksheet = ws;
+            //        break;
+            //    }
+            //}
 
             worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + equipment.EquipmentSubId;
             worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
@@ -42,13 +45,13 @@ namespace Nitrogen_FrontEnd.Services
             worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
 
 
-            workbook.SaveAs(FilePath);
+            Workbook.Save();
 
-            workbook.Close();
-            excelApp.Quit();
+            Workbook.Close();
+            ExcelApp.Quit();
             ReleaseObject(worksheet);
-            ReleaseObject(workbook);
-            ReleaseObject(excelApp);
+            ReleaseObject(Workbook);
+            ReleaseObject(ExcelApp);
 
             MessageBox.Show("Data written to Excel successfully!");
             //}
@@ -58,7 +61,11 @@ namespace Nitrogen_FrontEnd.Services
             //}
         }
 
-        public void WriteDataToExcelProject() { }
+        public void WriteDataToExcelProject(int projectId)
+        {
+            Project project = DbService.GetProjectById(projectId);
+            List<Equipment> projectEquipment = DbService.GetEquipmentForProject(project.ProjectNumber);
+        }
 
         private void ReleaseObject(object obj)
         {
