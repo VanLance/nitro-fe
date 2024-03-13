@@ -1,10 +1,29 @@
+CREATE TABLE EquipDbFieldToExcelColumnMap(
+	Id INT PRIMARY KEY IDENTITY,
+	EquipListNumber INT NOT NULL,
+	[Description] INT NOT NULL,
+	ControlPanel INT NOT NULL,
+	Notes INT NOT NULL,
+);
+
+CREATE TABLE EquipSheetFormat(
+	Id INT PRIMARY KEY IDENTITY,
+	[FileName] NVARCHAR(250) NOT NULL,
+	StartingDataLine INT NOT NULL,
+	EquipDbFieldToExcelColumnMapId INT NOT NULL,
+
+	CONSTRAINT FK_EquipDbFieldToExcelColumnMap FOREIGN KEY (EquipDbFieldToExcelColumnMapId) REFERENCES EquipDbFieldToExcelColumnMap (Id)
+);
 
 CREATE TABLE Project (
 	ProjectNumber VARCHAR(100) PRIMARY KEY NOT NULL,
 	[Description] VARCHAR(255),
-	EquipListFormatDef VARCHAR(255),
-	IoListFormatDef VARCHAR(255)
+	EquipSheetFormatId INT NOT NULL,
+	IoSheetFormatId INT
+
+	CONSTRAINT FK_EquipSheetFormat FOREIGN KEY (EquipSheetFormatId) REFERENCES EquipSheetFormat (Id)
 );
+
 
 CREATE TABLE Vendor (
 	Id INT PRIMARY KEY IDENTITY,
@@ -33,6 +52,7 @@ CREATE TABLE UserDefinition (
 	CbLabel5 VARCHAR(100)
 );
 
+
 CREATE TABLE Equipment (
 	Id INT PRIMARY KEY IDENTITY NOT NULL,
 	ProjectNumber VARCHAR(100) NOT NULL,
@@ -47,6 +67,7 @@ CREATE TABLE Equipment (
 	ModelNumber VARCHAR(50),
 	VendorId INT,
 	UserDefinitionId Int,
+	ExcelRowNumber int
 
 	CONSTRAINT FK_ProjectNumber FOREIGN KEY (ProjectNumber) REFERENCES Project (ProjectNumber),
 	CONSTRAINT FK_Vendor FOREIGN KEY (VendorId) REFERENCES Vendor (Id),
@@ -60,4 +81,12 @@ CREATE TABLE [IO] (
 	CONSTRAINT FK_IO FOREIGN KEY (EquipmentId) REFERENCES Equipment (Id)
 );
 
+DELETE FROM EquipDbFieldToExcelColumnMap;
+DELETE FROM EquipSheetFormat;
+DELETE FROM Equipment;
+DELETE FROM PROJECT;
+
+SELECT * From EquipDbFieldToExcelColumnMap;
+SELECT * FROM EquipSheetFormat;
 SELECT * FROM Project;
+SELECT * FROM Equipment ORDER BY ExcelRowNumber;
