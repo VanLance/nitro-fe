@@ -1,5 +1,6 @@
 ﻿using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
+using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -22,18 +23,17 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class ProjectEquipmentView : Page
     {
-        private DatabaseService databaseService;
-        public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-        private ExcelWriter ExcelWriter;
-        private EquipSheetFormat SheetFormat;
-        private string ProjectNumber;
+        private readonly DatabaseService databaseService;
+        private readonly ExcelWriter ExcelWriter;
+        private EquipSheetFormat sheetFormat;
+        private readonly string projectNumber;
 
         public ProjectEquipmentView(string projectNumber)
         {
             InitializeComponent();
 
+            this.projectNumber = projectNumber;
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            ProjectNumber = projectNumber;
             ExcelWriter = GenerateExcelWriter();
             ShowEquipment();
         }
@@ -42,7 +42,7 @@ namespace Nitrogen_FrontEnd.Views
         {
             try
             {
-                var equipmentDataList = databaseService.GetEquipmentForProject(ProjectNumber);
+                var equipmentDataList = databaseService.GetEquipmentForProject(projectNumber); ;
 
                 equipmentList.ItemsSource = equipmentDataList;
                 equipmentList.SelectedValuePath = "Id";
@@ -56,12 +56,10 @@ namespace Nitrogen_FrontEnd.Views
 
         private ExcelWriter GenerateExcelWriter()
         {
-            ExcelWriter excelWriter = null;
 
-            Project project = databaseService.GetProjectByProjectNumber(ProjectNumber);
-            SheetFormat = databaseService.GetSheetFormatById(project.EquipSheetFormatId);
-            excelWriter = new ExcelWriter(SheetFormat.FileName);
-            return excelWriter;
+            Project project = databaseService.GetProjectByProjectNumber(projectNumber);
+            sheetFormat = databaseService.GetSheetFormatById(project.EquipSheetFormatId);
+            return new ExcelWriter(sheetFormat.FileName);
         }
 
         private void ViewEquipmentCard_Click(object sender, RoutedEventArgs e)
@@ -78,36 +76,14 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        public void UpdateDatabase_Click(object sender, RoutedEventArgs e)
+        public void UpdateDb_Click(object sender, RoutedEventArgs e)
         {
-            object selectedId = equipmentList.SelectedValue;
-            if (selectedId != null)
-            {
-                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
-
-                databaseService.EditEquipment(selectedEquipment);
-            }
-            else
-            {
-                MessageBox.Show("Please Select Equipment");
-            }
+            EquipmentUpdater.UpdateDatabase(databaseService, equipmentList);
         }
 
         public void UpdateExcel_Click(object sender, RoutedEventArgs e)
         {
-            object selectedId = equipmentList.SelectedValue;
-            if (selectedId != null)
-            {
-                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
-
-                EquipDbFieldToExcelColumnMap equipmentMap = databaseService.GetEquipDbToExcelMapById(SheetFormat.EquipDbFieldToExcelColumnMapId);
-
-                ExcelWriter.WriteDataToExcelRow(selectedEquipment, equipmentMap);
-            }
-            else
-            {
-                MessageBox.Show("Please Select Equipment");
-            }
+            EquipmentUpdater.UpdateExcel(databaseService, ExcelWriter, equipmentList, sheetFormat);
         }
     }
 }

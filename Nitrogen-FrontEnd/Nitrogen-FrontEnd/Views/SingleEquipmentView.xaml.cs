@@ -22,19 +22,17 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class SingleEquipmentView : Page
     {
-        private DatabaseService databaseService;
-        public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-        private int EquipmentId;
-        private Equipment equipment;
+        private readonly DatabaseService databaseService;
+        private int equipmentId;
+        private readonly Equipment equipment;
 
         public SingleEquipmentView(int equipmentId)
         {
             InitializeComponent();
 
-            EquipmentId = equipmentId;
-
+            this.equipmentId = equipmentId;
             databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            equipment = databaseService.GetSingleEquipmentById(EquipmentId);
+            equipment = databaseService.GetSingleEquipmentById(equipmentId);
 
             ShowEquipment();
         }

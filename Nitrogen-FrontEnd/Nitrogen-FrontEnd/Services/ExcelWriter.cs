@@ -7,64 +7,74 @@ using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd.Services
 {
-    class ExcelWriter
+    public class ExcelWriter
     {
         private string FilePath;
-        static private DatabaseService DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         private Application ExcelApp;
         private Workbook Workbook;
+        private DatabaseService DbService;
 
         public ExcelWriter(string filePath)
         {
             FilePath = filePath;
             ExcelApp = new Application();
             Workbook = ExcelApp.Workbooks.Open(FilePath);
+            DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         }
 
-        public void WriteDataToExcelRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
+        public void CloseWorkbook()
         {
-            //try
-            //{
+            Workbook?.Close();
+            Workbook = null;
+        }
 
-            Worksheet worksheet = Workbook.Worksheets[equipment.Area];
-
-            //Worksheet worksheet = null;
-            //foreach (Worksheet ws in workbook.Worksheets)
-            //{
-            //    Console.WriteLine(ws.Name + "worksheet Name");
-            //    if (ws.Name == equipment.Area)
-            //    {
-            //        worksheet = ws;
-            //        break;
-            //    }
-            //}
-
-            worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + equipment.EquipmentSubId;
-            worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
-            worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
-            worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
-
-
-            Workbook.Save();
-
-            Workbook.Close();
-            ExcelApp.Quit();
-            ReleaseObject(worksheet);
+        public void ReleaseResources()
+        {
             ReleaseObject(Workbook);
             ReleaseObject(ExcelApp);
+            DbService = null;
+        }
 
-            MessageBox.Show("Data written to Excel successfully!");
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Error writing to Excel: " + ex.Message);
-            //}
+        private void WriteDataToExcelRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
+        {
+            try
+            {
+                Worksheet worksheet = Workbook.Worksheets[equipment.Area];
+
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + equipment.EquipmentSubId;
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
+
+                Workbook.Save();
+
+                MessageBox.Show("Data written to Excel successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error writing to Excel: " + ex.Message);
+            }
+        }
+
+        public void WriteDataToSingleRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
+        {
+            WriteDataToExcelRow(equipment, dbToExcelMap);
+            CloseWorkbook();
+            ReleaseResources();
         }
 
         public void WriteDataToExcelProject(int projectId)
         {
             Project project = DbService.GetProjectById(projectId);
+            EquipSheetFormat sheetFormat = DbService.GetSheetFormatById(project.EquipSheetFormatId);
+            EquipDbFieldToExcelColumnMap dbToExcelMap = DbService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
             List<Equipment> projectEquipment = DbService.GetEquipmentForProject(project.ProjectNumber);
+            foreach (Equipment equipment in projectEquipment)
+            {
+                WriteDataToExcelRow(equipment, dbToExcelMap);
+            }
+            CloseWorkbook();
+            ReleaseResources();
         }
 
         private void ReleaseObject(object obj)

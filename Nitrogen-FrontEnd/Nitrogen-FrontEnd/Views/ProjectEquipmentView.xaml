@@ -52,7 +52,7 @@
 
         <Button
             Content="Update Database"
-            Click="UpdateDatabase_Click"
+            Click="UpdateDb_Click"
             Height="30"
             Width="200"
             Grid.Column="1"

@@ -12,9 +12,7 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class ProjectsView : Page
     {
-
-        private DatabaseService databaseService;
-        public SqlConnection sqlConnection = new SqlConnection("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        private readonly DatabaseService databaseService;
 
         public ProjectsView()
         {
