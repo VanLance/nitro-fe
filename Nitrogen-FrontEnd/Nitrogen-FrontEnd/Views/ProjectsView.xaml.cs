@@ -42,12 +42,12 @@ namespace Nitrogen_FrontEnd.Views
 
 
 
-        private void ViewProjectsEquipment_Click(object Sender, RoutedEventArgs e)
+        private void ViewProjectsEquipment_Click(object sender, RoutedEventArgs e)
         {
-            var selectedProjectNumber = projectList.SelectedValue;
-            if (selectedProjectNumber != null)
+            Project selectedProject = (Project)projectList.SelectedItem;
+            if (selectedProject != null)
             {
-                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectList.SelectedValue.ToString());
+                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(selectedProject.ProjectNumber);
                 NavigationService.Navigate(projectEquipmentView);
             }
             else
