@@ -29,11 +29,25 @@
             HorizontalAlignment="Center"
             Grid.ColumnSpan="3" />
 
-        <DataGrid
+        <ListBox
             x:Name="projectList"
             Margin="0,10,0,10"
             Grid.Row="1"
-            Grid.ColumnSpan="3" />
+            Grid.ColumnSpan="3">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock
+                            Text="{Binding ProjectNumber}"
+                            FontWeight="Bold" />
+                        <TextBlock
+                            Text="{Binding Description}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
 
         <Button
             Click="ViewProjectsEquipment_Click"

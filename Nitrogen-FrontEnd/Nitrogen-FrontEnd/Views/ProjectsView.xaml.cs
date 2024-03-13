@@ -6,6 +6,7 @@ using System;
 using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Nitrogen_FrontEnd.Views
 {
@@ -31,16 +32,15 @@ namespace Nitrogen_FrontEnd.Views
             try
             {
                 var projects = projectService.GetAllProjects();
-
                 projectList.ItemsSource = projects;
-                projectList.SelectedValuePath = "ProjectNumber";
-                projectList.AutoGenerateColumns = true;
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
         }
+
+
 
         private void ViewProjectsEquipment_Click(object Sender, RoutedEventArgs e)
         {
