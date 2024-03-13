@@ -1,5 +1,6 @@
 ﻿using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
+using Nitrogen_FrontEnd.Services.DatabaseService;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -22,7 +23,7 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class SingleEquipmentView : Page
     {
-        private readonly DatabaseService databaseService;
+        private readonly EquipmentService databaseService;
         private int equipmentId;
         private readonly Equipment equipment;
 
@@ -31,7 +32,7 @@ namespace Nitrogen_FrontEnd.Views
             InitializeComponent();
 
             this.equipmentId = equipmentId;
-            databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            databaseService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             equipment = databaseService.GetSingleEquipmentById(equipmentId);
 
             ShowEquipment();

@@ -126,10 +126,12 @@
     <Compile Include="Models\EquipDbFieldToExcelColumnMap.cs" />
     <Compile Include="Models\EquipSheetFormat.cs" />
     <Compile Include="Services\DatabaseService\EquipmentService.cs" />
+    <Compile Include="Services\DatabaseService\EquipmentSheetFormatService.cs" />
     <Compile Include="Services\DatabaseService\MappingService.cs" />
     <Compile Include="Services\DatabaseService\ProjectService.cs" />
     <Compile Include="Services\ExcelWriter.cs" />
     <Compile Include="Utilities\EquipmentUpdater.cs" />
+    <Compile Include="Utilities\ExcelWriterGenerator.cs" />
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
       <DependentUpon>AddDataFromExcel.xaml</DependentUpon>
     </Compile>
@@ -188,7 +190,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\Equipment.cs" />
-    <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Models\IO.cs" />
     <Compile Include="Models\Project.cs" />

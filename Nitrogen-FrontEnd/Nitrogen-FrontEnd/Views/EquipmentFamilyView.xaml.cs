@@ -1,5 +1,6 @@
 ﻿using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
+using Nitrogen_FrontEnd.Services.DatabaseService;
 using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class EquipmentFamilyView : Page
     {
-        private readonly DatabaseService databaseService;
+        private readonly ProjectService projectService;
+        private readonly EquipmentService equipmentService;
+        private readonly EquipmentSheetFormatService sheetFormatService;
+        private readonly MappingService mappingService;
         private readonly ExcelWriter excelWriter;
         private EquipSheetFormat sheetFormat;
         private readonly string projectNumber;
@@ -25,8 +29,11 @@ namespace Nitrogen_FrontEnd.Views
 
             this.equipmentId = equipmentId;
             this.projectNumber = projectNumber;
-            databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            excelWriter = GenerateExcelWriter();
+            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
 
             ShowEquipmentFamily();
         }
@@ -35,7 +42,7 @@ namespace Nitrogen_FrontEnd.Views
         {
             try
             {
-                List<Equipment> equipmentDataList = databaseService.GetEquipmentFamily(equipmentId, projectNumber);
+                List<Equipment> equipmentDataList = equipmentService.GetEquipmentFamily(equipmentId, projectNumber);
 
                 equipmentList.ItemsSource = equipmentDataList;
                 equipmentList.SelectedValuePath = "EquipmentId";
@@ -47,22 +54,17 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private ExcelWriter GenerateExcelWriter()
-        {
-
-            Project project = databaseService.GetProjectByProjectNumber(projectNumber);
-            sheetFormat = databaseService.GetSheetFormatById(project.EquipSheetFormatId);
-            return new ExcelWriter(sheetFormat.FileName);
-        }
 
         public void UpdateDb_Click(object sender, RoutedEventArgs e)
         {
-            EquipmentUpdater.UpdateDatabase(databaseService, equipmentList);
+            EquipmentUpdater.UpdateDatabase(equipmentService, equipmentList);
         }
 
         public void UpdateExcel_Click(object sender, RoutedEventArgs e)
         {
-            EquipmentUpdater.UpdateExcel(databaseService, excelWriter, equipmentList, sheetFormat);
+            Project project = projectService.GetProjectByProjectNumber(projectNumber);
+            sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
+            EquipmentUpdater.UpdateExcel(mappingService, excelWriter, equipmentList, sheetFormat);
         }
 
     }

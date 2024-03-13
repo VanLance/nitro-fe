@@ -2,12 +2,14 @@
 using System.Windows.Controls;
 using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
+using Nitrogen_FrontEnd.Services.DatabaseService;
 
 namespace Nitrogen_FrontEnd.Utilities
 {
     public static class EquipmentUpdater
     {
-        public static void UpdateDatabase(DatabaseService databaseService, DataGrid equipmentList)
+
+        public static void UpdateDatabase(EquipmentService databaseService, DataGrid equipmentList)
         {
             object selectedId = equipmentList.SelectedValue;
             if (selectedId != null)
@@ -21,7 +23,7 @@ namespace Nitrogen_FrontEnd.Utilities
             }
         }
 
-        public static void UpdateExcel(DatabaseService databaseService, ExcelWriter excelWriter, DataGrid equipmentList, EquipSheetFormat sheetFormat)
+        public static void UpdateExcel(MappingService databaseService, ExcelWriter excelWriter, DataGrid equipmentList, EquipSheetFormat sheetFormat)
         {
             object selectedId = equipmentList.SelectedValue;
             if (selectedId != null)

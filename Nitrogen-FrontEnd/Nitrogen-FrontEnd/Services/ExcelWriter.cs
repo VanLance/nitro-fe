@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using Nitrogen_FrontEnd.Models;
+using Nitrogen_FrontEnd.Services.DatabaseService;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -12,27 +13,31 @@ namespace Nitrogen_FrontEnd.Services
         private string FilePath;
         private Application ExcelApp;
         private Workbook Workbook;
-        private DatabaseService DbService;
+        private readonly ProjectService projectService;
+        private readonly EquipmentService equipmentService;
+        private readonly EquipmentSheetFormatService sheetFormatService;
+        private readonly MappingService mappingService;
 
         public ExcelWriter(string filePath)
         {
             FilePath = filePath;
             ExcelApp = new Application();
             Workbook = ExcelApp.Workbooks.Open(FilePath);
-            DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         }
 
         public void CloseWorkbook()
         {
             Workbook?.Close();
-            Workbook = null;
         }
 
         public void ReleaseResources()
         {
             ReleaseObject(Workbook);
             ReleaseObject(ExcelApp);
-            DbService = null;
         }
 
         private void WriteDataToExcelRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
@@ -46,9 +51,6 @@ namespace Nitrogen_FrontEnd.Services
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
 
-                Workbook.Save();
-
-                MessageBox.Show("Data written to Excel successfully!");
             }
             catch (Exception ex)
             {
@@ -58,23 +60,42 @@ namespace Nitrogen_FrontEnd.Services
 
         public void WriteDataToSingleRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
         {
-            WriteDataToExcelRow(equipment, dbToExcelMap);
-            CloseWorkbook();
-            ReleaseResources();
-        }
-
-        public void WriteDataToExcelProject(int projectId)
-        {
-            Project project = DbService.GetProjectById(projectId);
-            EquipSheetFormat sheetFormat = DbService.GetSheetFormatById(project.EquipSheetFormatId);
-            EquipDbFieldToExcelColumnMap dbToExcelMap = DbService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
-            List<Equipment> projectEquipment = DbService.GetEquipmentForProject(project.ProjectNumber);
-            foreach (Equipment equipment in projectEquipment)
+            try
             {
                 WriteDataToExcelRow(equipment, dbToExcelMap);
+                Workbook.Save();
+                MessageBox.Show("Data written to Excel successfully!");
             }
-            CloseWorkbook();
-            ReleaseResources();
+            finally
+            {
+                CloseWorkbook();
+                ReleaseResources();
+            }
+        }
+
+        public void WriteDataToExcelProject(string projectId)
+        {
+            Project project = projectService.GetProjectByProjectNumber(projectId);
+            EquipSheetFormat sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
+            EquipDbFieldToExcelColumnMap dbToExcelMap = mappingService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
+            List<Equipment> projectEquipment = equipmentService.GetEquipmentForProject(project.ProjectNumber);
+            
+            try
+            {
+                foreach (Equipment equipment in projectEquipment)
+                {
+                    WriteDataToExcelRow(equipment, dbToExcelMap);
+                }
+
+                Workbook.Save();
+                MessageBox.Show("Data written to Excel successfully!");
+            }
+            finally
+            {
+                CloseWorkbook();
+                ReleaseResources();
+            }
+
         }
 
         private void ReleaseObject(object obj)

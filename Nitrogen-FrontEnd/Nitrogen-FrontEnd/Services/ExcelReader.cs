@@ -5,20 +5,29 @@ using System;
 using System.Windows;
 using System.Collections.Generic;
 using Application = Microsoft.Office.Interop.Excel.Application;
+using Nitrogen_FrontEnd.Services.DatabaseService;
 
 namespace Nitrogen_FrontEnd
 {
     class ExcelReader
     {
         private string FilePath;
-        static private DatabaseService DbService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+        static private ProjectService projectService;
+        private readonly MappingService mappingService;
+        private readonly EquipmentService equipmentService;
+        private readonly EquipmentSheetFormatService sheetFormatService;
         private string ProjectNumber;
         private Project project;
         private Dictionary<string, int> ColumnNumbers = new Dictionary<string, int>();
 
         public ExcelReader(string filePath)
         {
+
             FilePath = filePath;
+            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
         }
 
         public void ReadExcelFile()
@@ -97,7 +106,7 @@ namespace Nitrogen_FrontEnd
 
         private bool ProjectInDb()
         {
-            return DbService.GetProjectByProjectNumber(project.ProjectNumber) != null;
+            return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
         }
 
         private void AddColumnNumbers(Range cell, int columnCount)
@@ -128,7 +137,7 @@ namespace Nitrogen_FrontEnd
                 int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
 
                 project.EquipSheetFormatId = sheetFormatPk;
-                DbService.AddProject(project);
+                projectService.AddProject(project);
 
             }
         }
@@ -155,7 +164,7 @@ namespace Nitrogen_FrontEnd
                         break;
                 }
             }
-            int dbExcelMapPk = DbService.AddEquipDbFieldToExcelColumnMap(dbToExcelMap);
+            int dbExcelMapPk = mappingService.AddEquipDbFieldToExcelColumnMap(dbToExcelMap);
             return dbExcelMapPk;
         }
 
@@ -168,7 +177,7 @@ namespace Nitrogen_FrontEnd
                 EquipDbFieldToExcelColumnMapId = dbExcelMapPk,
             };
 
-            int sheetFormatPK = DbService.AddEquipSheetFormat(sheetFormat);
+            int sheetFormatPK = sheetFormatService.AddEquipSheetFormat(sheetFormat);
             return sheetFormatPK;
         }
 
@@ -178,11 +187,11 @@ namespace Nitrogen_FrontEnd
             if (equipCell.Value != null)
             {
                 Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
-                if (DbService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"] : null, ProjectNumber) == null)
+                if (equipmentService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"] : null, ProjectNumber) == null)
                 {
                     Console.WriteLine(equipCell.Value.ToString());
                     Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
-                    DbService.AddEquipment(equipment);
+                    equipmentService.AddEquipment(equipment);
                 }
             }
         }

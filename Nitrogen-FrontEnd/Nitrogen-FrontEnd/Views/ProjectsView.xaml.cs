@@ -1,5 +1,7 @@
 ﻿using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
+using Nitrogen_FrontEnd.Services.DatabaseService;
+using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Data.SqlClient;
 using System.Windows;
@@ -12,13 +14,15 @@ namespace Nitrogen_FrontEnd.Views
     /// </summary>
     public partial class ProjectsView : Page
     {
-        private readonly DatabaseService databaseService;
+
+        private readonly ProjectService projectService;
 
         public ProjectsView()
         {
             InitializeComponent();
 
-            databaseService = new DatabaseService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+
             ShowProjects();
         }
 
@@ -26,7 +30,7 @@ namespace Nitrogen_FrontEnd.Views
         {
             try
             {
-                var projects = databaseService.GetAllProjects();
+                var projects = projectService.GetAllProjects();
 
                 projectList.ItemsSource = projects;
                 projectList.SelectedValuePath = "ProjectNumber";
@@ -59,11 +63,26 @@ namespace Nitrogen_FrontEnd.Views
             {
                 Project selectedProject = (Project)projectList.SelectedItem;
 
-                databaseService.EditProject(selectedProject);
+                projectService.EditProject(selectedProject);
             }
             else
             {
                 MessageBox.Show("Please Select Project");
+            }
+        }
+
+        private void UpdateSpreadsheet_Click(object sender, RoutedEventArgs e)
+        {
+            object selectedProjectNumber = projectList.SelectedValue;
+
+            if ( selectedProjectNumber != null)
+            {
+
+                string projectNumber = selectedProjectNumber.ToString();
+
+                ExcelWriter excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
+
+                excelWriter.WriteDataToExcelProject(projectNumber);
             }
         }
     }
