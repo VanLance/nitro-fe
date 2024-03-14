@@ -33,8 +33,6 @@ namespace Nitrogen_FrontEnd.Views
             {
                 var projects = projectService.GetAllProjects();
 
-                projectList.ItemsSource = projects;
-
                 projectGrid.ItemsSource = projects;
                 projectGrid.SelectedValuePath = "ProjectNumber";
 
@@ -50,21 +48,8 @@ namespace Nitrogen_FrontEnd.Views
 
         }
 
-
-
-
-        private void ViewProjectsEquipment_Click(object sender, RoutedEventArgs e)
-        {
-            Project selectedProject = (Project)projectList.SelectedItem;
-            if (selectedProject != null)
-            {
-                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(selectedProject.ProjectNumber);
-            }
-        }
-
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            // Handle the submit button click event here
             if (actionComboBox.SelectedItem != null)
             {
                 string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
@@ -118,13 +103,12 @@ namespace Nitrogen_FrontEnd.Views
         private void UpdateSpreadsheet()
         {
 
-            Project selectedProjectNumber = (Project)projectList.SelectedValue;
+            object selectedProjectNumber = projectGrid.SelectedValue;
 
-
-            if ( selectedProjectNumber != null)
+            if (selectedProjectNumber != null)
             {
 
-                string projectNumber = selectedProjectNumber.ProjectNumber;
+                string projectNumber = selectedProjectNumber.ToString();
 
                 ExcelWriter excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
 

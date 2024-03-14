@@ -18,7 +18,7 @@ namespace Nitrogen_FrontEnd.Views
         private readonly EquipmentService equipmentService;
         private readonly EquipmentSheetFormatService sheetFormatService;
         private readonly MappingService mappingService;
-        private readonly ExcelWriter excelWriter;
+        private ExcelWriter excelWriter;
         private EquipSheetFormat sheetFormat;
         private readonly string projectNumber;
         private readonly string equipmentId;
@@ -32,8 +32,7 @@ namespace Nitrogen_FrontEnd.Views
             projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
+            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");   
 
             ShowEquipmentFamily();
         }
@@ -92,6 +91,7 @@ namespace Nitrogen_FrontEnd.Views
             if (selectedId != null)
             {
                 Project project = projectService.GetProjectByProjectNumber(projectNumber);
+                excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
                 sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
                 EquipmentUpdater.UpdateExcel(mappingService, excelWriter, equipmentList, sheetFormat);
             }

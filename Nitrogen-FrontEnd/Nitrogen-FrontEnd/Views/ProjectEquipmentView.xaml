@@ -37,7 +37,6 @@
             Grid.ColumnSpan="2"
             FontWeight="Bold" />
 
-        <!-- Action Selection -->
         <StackPanel
             Orientation="Horizontal"
             Grid.Row="2"

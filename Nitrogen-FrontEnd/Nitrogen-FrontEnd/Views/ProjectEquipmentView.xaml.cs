@@ -101,7 +101,6 @@ namespace Nitrogen_FrontEnd.Views
             if (selectedId != null)
             {
                 Project project = projectService.GetProjectByProjectNumber(projectNumber);
-                Equipment equipment = (Equipment)equipmentList.SelectedItem;
                 sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
                 ExcelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
                 EquipmentUpdater.UpdateExcel(mappingService, ExcelWriter, equipmentList, sheetFormat);
