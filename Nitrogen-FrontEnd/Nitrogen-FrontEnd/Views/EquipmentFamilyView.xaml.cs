@@ -54,17 +54,51 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-
-        public void UpdateDb_Click(object sender, RoutedEventArgs e)
+        private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            EquipmentUpdater.UpdateDatabase(equipmentService, equipmentList);
+            // Handle the submit button click event here
+            if (actionComboBox.SelectedItem != null)
+            {
+                string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
+                switch (selectedAction)
+                { 
+                    case "Update Database":
+                        UpdateDatabase();
+                        break;
+                    case "Update Spreadsheet":
+                        UpdateSpreadsheet();
+                        break;
+                }
+            }
         }
 
-        public void UpdateExcel_Click(object sender, RoutedEventArgs e)
+        public void UpdateDatabase()
         {
-            Project project = projectService.GetProjectByProjectNumber(projectNumber);
-            sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
-            EquipmentUpdater.UpdateExcel(mappingService, excelWriter, equipmentList, sheetFormat);
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                EquipmentUpdater.UpdateDatabase(equipmentService, equipmentList);
+
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
+        }
+
+        public void UpdateSpreadsheet()
+        {
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                Project project = projectService.GetProjectByProjectNumber(projectNumber);
+                sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
+                EquipmentUpdater.UpdateExcel(mappingService, excelWriter, equipmentList, sheetFormat);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
         }
 
     }

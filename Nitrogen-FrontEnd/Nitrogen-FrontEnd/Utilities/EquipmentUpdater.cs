@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
@@ -16,6 +17,7 @@ namespace Nitrogen_FrontEnd.Utilities
             {
                 Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
                 databaseService.EditEquipment(selectedEquipment);
+                MessageBox.Show("Database Updated");
             }
             else
             {
@@ -29,6 +31,7 @@ namespace Nitrogen_FrontEnd.Utilities
             if (selectedId != null)
             {
                 Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+   
                 EquipDbFieldToExcelColumnMap equipmentMap = databaseService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
                 excelWriter.WriteDataToSingleRow(selectedEquipment, equipmentMap);
             }

@@ -32,13 +32,24 @@ namespace Nitrogen_FrontEnd.Views
             try
             {
                 var projects = projectService.GetAllProjects();
+
                 projectList.ItemsSource = projects;
+
+                projectGrid.ItemsSource = projects;
+                projectGrid.SelectedValuePath = "ProjectNumber";
+
+                projectGrid.Columns.Add(new DataGridTextColumn { Header = "Project Number", Binding = new Binding("ProjectNumber") });
+                projectGrid.Columns.Add(new DataGridTextColumn { Header = "Description", Binding = new Binding("Description") });
+                projectGrid.AutoGenerateColumns = false;
+
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
+
         }
+
 
 
 
@@ -48,6 +59,39 @@ namespace Nitrogen_FrontEnd.Views
             if (selectedProject != null)
             {
                 ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(selectedProject.ProjectNumber);
+            }
+        }
+
+        private void SubmitButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Handle the submit button click event here
+            if (actionComboBox.SelectedItem != null)
+            {
+                string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
+                switch (selectedAction)
+                {
+                    case "View Projects Equipment":
+                        ViewProjectsEquipment();
+                        break;
+                    case "Update Spreadsheet from DB":
+                        UpdateSpreadsheet();
+                        break;
+                    case "Update Database from Edit":
+                        UpdateDatabaseFromEdit();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void ViewProjectsEquipment()
+        {
+            var selectedProjectNumber = projectGrid.SelectedValue;
+            if (selectedProjectNumber != null)
+            {
+                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectGrid.SelectedValue.ToString());
+
                 NavigationService.Navigate(projectEquipmentView);
             }
             else
@@ -56,12 +100,12 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private void EditProject_Click(object sender, RoutedEventArgs e)
+        private void UpdateDatabaseFromEdit()
         {
-            var selectedProjectNumber = projectList.SelectedValue;
+            var selectedProjectNumber = projectGrid.SelectedValue;
             if (selectedProjectNumber != null)
             {
-                Project selectedProject = (Project)projectList.SelectedItem;
+                Project selectedProject = (Project)projectGrid.SelectedItem;
 
                 projectService.EditProject(selectedProject);
             }
@@ -71,9 +115,13 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private void UpdateSpreadsheet_Click(object sender, RoutedEventArgs e)
+        private void UpdateSpreadsheet()
         {
+
             Project selectedProjectNumber = (Project)projectList.SelectedValue;
+
+            object selectedProjectNumber = projectGrid.SelectedValue;
+
 
             if ( selectedProjectNumber != null)
             {
@@ -83,6 +131,10 @@ namespace Nitrogen_FrontEnd.Views
                 ExcelWriter excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
 
                 excelWriter.WriteDataToExcelProject(projectNumber);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Project");
             }
         }
     }

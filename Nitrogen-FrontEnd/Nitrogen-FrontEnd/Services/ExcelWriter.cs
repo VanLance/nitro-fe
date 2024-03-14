@@ -45,10 +45,12 @@ namespace Nitrogen_FrontEnd.Services
             try
             {
                 Worksheet worksheet = Workbook.Worksheets[equipment.Area];
+                Console.WriteLine(FilePath + "\n\n" + equipment.Area + $"equip area \n DESCRIPTION: {equipment.Description} \nNotes: {equipment.Notes}");
 
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + equipment.EquipmentSubId;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
+                Console.WriteLine($"Old Notes Value: {worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value} \n New: {equipment.Notes}");
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
 
             }
