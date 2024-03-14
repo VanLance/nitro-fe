@@ -120,8 +120,6 @@ namespace Nitrogen_FrontEnd.Views
 
             Project selectedProjectNumber = (Project)projectList.SelectedValue;
 
-            object selectedProjectNumber = projectGrid.SelectedValue;
-
 
             if ( selectedProjectNumber != null)
             {
