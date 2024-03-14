@@ -17,7 +17,7 @@ namespace Nitrogen_FrontEnd.Views
         private readonly EquipmentService equipmentService;
         private readonly EquipmentSheetFormatService sheetFormatService;
         private readonly MappingService mappingService;
-        private readonly ExcelWriter ExcelWriter;
+        private ExcelWriter ExcelWriter;
         private EquipSheetFormat sheetFormat;
         private readonly string projectNumber;
 
@@ -30,7 +30,6 @@ namespace Nitrogen_FrontEnd.Views
             equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            ExcelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
             ShowEquipment();
         }
 
@@ -50,7 +49,26 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        private void ViewEquipmentCard_Click(object sender, RoutedEventArgs e)
+        private void SubmitButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (actionComboBox.SelectedItem != null)
+            {
+                string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
+                switch (selectedAction)
+                {
+                    case "View Equipment Card":
+                        ViewEquipmentCard();
+                        break;
+                    case "Update Database":
+                        UpdateDatabase();
+                        break;
+                    case "Update Spreadsheet":
+                        UpdateSpreadsheet();
+                        break;
+                }
+            }
+        }
+        private void ViewEquipmentCard()
         {
             object selectedId = equipmentList.SelectedValue;
             if (selectedId != null)
@@ -64,16 +82,34 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        public void UpdateDb_Click(object sender, RoutedEventArgs e)
+        public void UpdateDatabase()
         {
-            EquipmentUpdater.UpdateDatabase(equipmentService, equipmentList);
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                EquipmentUpdater.UpdateDatabase(equipmentService, equipmentList);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
         }
 
-        public void UpdateExcel_Click(object sender, RoutedEventArgs e)
+        public void UpdateSpreadsheet()
         {
-            Project project = projectService.GetProjectByProjectNumber(projectNumber);
-            sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
-            EquipmentUpdater.UpdateExcel(mappingService, ExcelWriter, equipmentList, sheetFormat);
+            object selectedId = equipmentList.SelectedValue;
+            if (selectedId != null)
+            {
+                Project project = projectService.GetProjectByProjectNumber(projectNumber);
+                Equipment equipment = (Equipment)equipmentList.SelectedItem;
+                sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
+                ExcelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
+                EquipmentUpdater.UpdateExcel(mappingService, ExcelWriter, equipmentList, sheetFormat);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
         }
     }
 }
