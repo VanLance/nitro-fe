@@ -73,12 +73,12 @@ namespace Nitrogen_FrontEnd.Views
 
         private void UpdateSpreadsheet_Click(object sender, RoutedEventArgs e)
         {
-            object selectedProjectNumber = projectList.SelectedValue;
+            Project selectedProjectNumber = (Project)projectList.SelectedValue;
 
             if ( selectedProjectNumber != null)
             {
 
-                string projectNumber = selectedProjectNumber.ToString();
+                string projectNumber = selectedProjectNumber.ProjectNumber;
 
                 ExcelWriter excelWriter = ExcelWriterGenerator.ExcelWriter(projectNumber);
 
