@@ -82,9 +82,11 @@ namespace Nitrogen_FrontEnd.Views
         private void ViewEquipmentCard()
         {
             object selectedId = equipmentGrid.SelectedValue;
+            Console.WriteLine(selectedId.ToString() + " ================= selected I");
             if (selectedId != null)
             {
-                SingleEquipmentView singleEquipmentView = new SingleEquipmentView((int)selectedId);
+                Equipment equipment= (Equipment)equipmentGrid.SelectedItem;
+                SingleEquipmentView singleEquipmentView = new SingleEquipmentView(equipment.Id);
                 NavigationService.Navigate(singleEquipmentView);
             }
             else
