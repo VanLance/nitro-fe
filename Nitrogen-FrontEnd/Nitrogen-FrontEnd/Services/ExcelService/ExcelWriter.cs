@@ -64,10 +64,7 @@ namespace Nitrogen_FrontEnd.Services
             {
                 Worksheet worksheet = Workbook.Worksheets[equipment.Area];
 
-                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + "." + equipment.EquipmentSubId;
-
-                Console.WriteLine($"=========== \n\nFilePath: {FilePath}\n\nOld Description: {worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value.ToString()}\n\nNew Description: {equipment.Description}");
-
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = $"{equipment.EquipmentId}.{equipment.EquipmentSubId}";
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
@@ -84,7 +81,6 @@ namespace Nitrogen_FrontEnd.Services
             try
             {
                 WriteDataToExcelRow(equipment, dbToExcelMap);
-
                 Workbook.Save();
                 MessageBox.Show("Data written to Excel successfully!");
             }
@@ -125,7 +121,6 @@ namespace Nitrogen_FrontEnd.Services
             {
                 if (disposing)
                 {
-                    // Release managed resources
                     CloseWorkbook();
                     ReleaseResources();
                 }

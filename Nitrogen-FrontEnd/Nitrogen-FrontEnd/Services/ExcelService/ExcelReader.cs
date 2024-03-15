@@ -22,7 +22,6 @@ namespace Nitrogen_FrontEnd
 
         public ExcelReader(string filePath)
         {
-
             FilePath = filePath;
             projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
