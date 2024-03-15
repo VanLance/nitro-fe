@@ -129,7 +129,7 @@
     <Compile Include="Services\DatabaseService\EquipmentSheetFormatService.cs" />
     <Compile Include="Services\DatabaseService\MappingService.cs" />
     <Compile Include="Services\DatabaseService\ProjectService.cs" />
-    <Compile Include="Services\ExcelWriter.cs" />
+    <Compile Include="Services\ExcelService\ExcelWriter.cs" />
     <Compile Include="Utilities\EquipmentUpdater.cs" />
     <Compile Include="Utilities\ExcelWriterGenerator.cs" />
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
@@ -190,7 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\Equipment.cs" />
-    <Compile Include="Services\ExcelReader.cs" />
+    <Compile Include="Services\ExcelService\ExcelReader.cs" />
     <Compile Include="Models\IO.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\UserDefinition.cs" />

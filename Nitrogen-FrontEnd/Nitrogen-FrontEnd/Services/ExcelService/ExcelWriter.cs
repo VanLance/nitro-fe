@@ -8,7 +8,7 @@ using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd.Services
 {
-    public class ExcelWriter
+    public class ExcelWriter : IDisposable
     {
         private string FilePath;
         private Application ExcelApp;
@@ -17,6 +17,7 @@ namespace Nitrogen_FrontEnd.Services
         private readonly EquipmentService equipmentService;
         private readonly EquipmentSheetFormatService sheetFormatService;
         private readonly MappingService mappingService;
+        private bool disposed = false;
 
         public ExcelWriter(string filePath)
         {
@@ -36,8 +37,25 @@ namespace Nitrogen_FrontEnd.Services
 
         public void ReleaseResources()
         {
-            ReleaseObject(Workbook);
-            ReleaseObject(ExcelApp);
+            ReleaseObjects(Workbook, ExcelApp);
+        }
+
+        private void ReleaseObjects(params object[] objs)
+        {
+            foreach (var obj in objs)
+            {
+                try
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception occurred while releasing object: " + ex.Message);
+                }
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void WriteDataToExcelRow(Equipment equipment, EquipDbFieldToExcelColumnMap dbToExcelMap)
@@ -45,12 +63,13 @@ namespace Nitrogen_FrontEnd.Services
             try
             {
                 Worksheet worksheet = Workbook.Worksheets[equipment.Area];
-                Console.WriteLine(FilePath + "\n\n" + equipment.Area + $"equip area \n DESCRIPTION: {equipment.Description} \nNotes: {equipment.Notes}");
 
-                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + equipment.EquipmentSubId;
+                worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.EquipListNumber].Value = equipment.EquipmentId + "." + equipment.EquipmentSubId;
+
+                Console.WriteLine($"=========== \n\nFilePath: {FilePath}\n\nOld Description: {worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value.ToString()}\n\nNew Description: {equipment.Description}");
+
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Description].Value = equipment.Description;
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.ControlPanel].Value = equipment.ControlPanel;
-                Console.WriteLine($"Old Notes Value: {worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value} \n New: {equipment.Notes}");
                 worksheet.Cells[equipment.ExcelRowNumber, dbToExcelMap.Notes].Value = equipment.Notes;
 
             }
@@ -65,6 +84,7 @@ namespace Nitrogen_FrontEnd.Services
             try
             {
                 WriteDataToExcelRow(equipment, dbToExcelMap);
+
                 Workbook.Save();
                 MessageBox.Show("Data written to Excel successfully!");
             }
@@ -81,7 +101,7 @@ namespace Nitrogen_FrontEnd.Services
             EquipSheetFormat sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
             EquipDbFieldToExcelColumnMap dbToExcelMap = mappingService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
             List<Equipment> projectEquipment = equipmentService.GetEquipmentForProject(project.ProjectNumber);
-            
+
             try
             {
                 foreach (Equipment equipment in projectEquipment)
@@ -97,25 +117,32 @@ namespace Nitrogen_FrontEnd.Services
                 CloseWorkbook();
                 ReleaseResources();
             }
-
         }
 
-        private void ReleaseObject(object obj)
+        protected virtual void Dispose(bool disposing)
         {
-            try
+            if (!disposed)
             {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
+                if (disposing)
+                {
+                    // Release managed resources
+                    CloseWorkbook();
+                    ReleaseResources();
+                }
+
+                disposed = true;
             }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occurred while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
-            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ExcelWriter()
+        {
+            Dispose(false);
         }
     }
 }

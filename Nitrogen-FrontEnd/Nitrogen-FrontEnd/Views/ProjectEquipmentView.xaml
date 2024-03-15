@@ -53,9 +53,13 @@
                 <ComboBoxItem
                     Content="View Equipment Card" />
                 <ComboBoxItem
+                    Content="Update Database and Spreadsheet" />
+                <ComboBoxItem
                     Content="Update Database" />
                 <ComboBoxItem
                     Content="Update Spreadsheet" />
+                <ComboBoxItem
+                    Content="View Equipment Family" />
             </ComboBox>
             <Button
                 Content="Submit"
@@ -66,7 +70,7 @@
         </StackPanel>
 
         <DataGrid
-            x:Name="equipmentList"
+            x:Name="equipmentGrid"
             Margin="0,10,0,10"
             Grid.Row="1"
             Grid.ColumnSpan="2" />

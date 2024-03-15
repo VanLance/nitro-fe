@@ -10,12 +10,12 @@ namespace Nitrogen_FrontEnd.Utilities
     public static class EquipmentUpdater
     {
 
-        public static void UpdateDatabase(EquipmentService databaseService, DataGrid equipmentList)
+        public static void UpdateDatabase(EquipmentService databaseService, DataGrid equipmentGrid)
         {
-            object selectedId = equipmentList.SelectedValue;
+            object selectedId = equipmentGrid.SelectedValue;
             if (selectedId != null)
             {
-                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+                Equipment selectedEquipment = (Equipment)equipmentGrid.SelectedItem;
                 databaseService.EditEquipment(selectedEquipment);
                 MessageBox.Show("Database Updated");
             }
@@ -25,12 +25,12 @@ namespace Nitrogen_FrontEnd.Utilities
             }
         }
 
-        public static void UpdateExcel(MappingService databaseService, ExcelWriter excelWriter, DataGrid equipmentList, EquipSheetFormat sheetFormat)
+        public static void UpdateExcel(MappingService databaseService, ExcelWriter excelWriter, DataGrid equipmentGrid, EquipSheetFormat sheetFormat)
         {
-            object selectedId = equipmentList.SelectedValue;
+            object selectedId = equipmentGrid.SelectedValue;
             if (selectedId != null)
             {
-                Equipment selectedEquipment = (Equipment)equipmentList.SelectedItem;
+                Equipment selectedEquipment = (Equipment)equipmentGrid.SelectedItem;
    
                 EquipDbFieldToExcelColumnMap equipmentMap = databaseService.GetEquipDbToExcelMapById(sheetFormat.EquipDbFieldToExcelColumnMapId);
                 excelWriter.WriteDataToSingleRow(selectedEquipment, equipmentMap);
@@ -39,6 +39,12 @@ namespace Nitrogen_FrontEnd.Utilities
             {
                 MessageBox.Show("Please Select Equipment");
             }
+        }
+
+        public static void UpdateDbAndExcel(EquipmentService equipmentService, DataGrid equipmentGrid, MappingService mappingService, ExcelWriter excelWriter, EquipSheetFormat sheetFormat)
+        {
+            UpdateDatabase(equipmentService, equipmentGrid);
+            UpdateExcel(mappingService, excelWriter, equipmentGrid, sheetFormat);
         }
     }
 }

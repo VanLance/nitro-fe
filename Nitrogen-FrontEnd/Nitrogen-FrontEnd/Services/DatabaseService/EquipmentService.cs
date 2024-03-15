@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Windows;
 
 namespace Nitrogen_FrontEnd.Services.DatabaseService
 {
@@ -172,7 +173,7 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService
 
         public void AddEquipment(Equipment equipment)
         {
-            //if(GetSingleEquipmentByIdsAndProjectNumber())
+
             Equipment parentEquipment = GetSingleEquipmentByIdsAndProjectNumber(equipment.EquipmentId, null, equipment.ProjectNumber);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -204,27 +205,34 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService
 
         public void EditEquipment(Equipment equipment)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-
-                string insertQuery = "Update Equipment Set ProjectNumber = @ProjectNumber, Description = @Description, EquipmentId = @EquipmentId, EquipmentSubId = @EquipmentSubId , ParentEquipmentId = @ParentEquipmentId, ControlPanel = @ControlPanel, Area = @Area, Notes= @Notes WHERE Id = @Id;";
-
-                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
 
-                    command.Parameters.AddWithValue("@ProjectNumber", equipment.ProjectNumber);
-                    command.Parameters.AddWithValue("@Description", (object)equipment.Description ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
-                    command.Parameters.AddWithValue("@Area", equipment.Area);
-                    command.Parameters.AddWithValue("@EquipmentSubId", (object)equipment.EquipmentSubId ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Notes", (object)equipment.Notes ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@ParentEquipmentId", (object)equipment.ParentEquipmentId ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@ControlPanel", (object)equipment.ControlPanel ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Id", equipment.Id);
+                    string insertQuery = "Update Equipment Set ProjectNumber = @ProjectNumber, Description = @Description, EquipmentId = @EquipmentId, EquipmentSubId = @EquipmentSubId , ParentEquipmentId = @ParentEquipmentId, ControlPanel = @ControlPanel, Area = @Area, Notes= @Notes WHERE Id = @Id;";
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@ProjectNumber", equipment.ProjectNumber);
+                        command.Parameters.AddWithValue("@Description", (object)equipment.Description ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@EquipmentId", equipment.EquipmentId);
+                        command.Parameters.AddWithValue("@Area", equipment.Area);
+                        command.Parameters.AddWithValue("@EquipmentSubId", (object)equipment.EquipmentSubId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Notes", (object)equipment.Notes ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ParentEquipmentId", (object)equipment.ParentEquipmentId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ControlPanel", (object)equipment.ControlPanel ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Id", equipment.Id);
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: " + e.ToString());
             }
         }
 

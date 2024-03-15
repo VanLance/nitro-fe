@@ -3,6 +3,7 @@ using Nitrogen_FrontEnd.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Windows;
 
 namespace Nitrogen_FrontEnd.Services.DatabaseService
 {
@@ -104,17 +105,25 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService
 
         public void EditProject(Project project)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-
-                string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
-                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
-                    command.Parameters.AddWithValue("@Description", project.Description);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+
+                    string insertQuery = "Update Project SET Description = @Description WHERE ProjectNumber = @ProjectNumber";
+                    using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@ProjectNumber", project.ProjectNumber);
+                        command.Parameters.AddWithValue("@Description", project.Description);
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
                 }
+                MessageBox.Show("Database Updated");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: " + e.ToString());
             }
         }
 
