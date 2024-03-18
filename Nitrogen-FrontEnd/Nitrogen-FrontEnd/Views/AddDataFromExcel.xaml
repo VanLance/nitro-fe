@@ -11,8 +11,9 @@
     Height="450"
     Width="800">
     <Grid>
-
+        
         <StackPanel
+            x:Name="stackPanel"
             Margin="50">
             <Button
                 x:Name="BrowseBtn"

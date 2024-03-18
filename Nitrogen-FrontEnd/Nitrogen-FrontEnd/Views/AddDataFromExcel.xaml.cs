@@ -1,17 +1,7 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nitrogen_FrontEnd.Controls;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using Page = System.Windows.Controls.Page;
 
 namespace Nitrogen_FrontEnd.Views
 {
@@ -21,6 +11,8 @@ namespace Nitrogen_FrontEnd.Views
     public partial class AddDataFromExcel : Page
     {
         ExcelReader ExcelReader;
+        AreaCheckBoxes areaCheckBoxes;
+
         public AddDataFromExcel()
         {
             InitializeComponent();
@@ -41,7 +33,9 @@ namespace Nitrogen_FrontEnd.Views
             if (txtFilePath.Text != "")
             {
                 ExcelReader = new ExcelReader(txtFilePath.Text);
-                ExcelReader.ReadExcelFile();
+                
+                areaCheckBoxes = new AreaCheckBoxes(ExcelReader, stackPanel);
+                stackPanel.Children.Add(areaCheckBoxes);
             }
             else
             {

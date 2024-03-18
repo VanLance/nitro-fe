@@ -117,6 +117,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\AreaCheckBoxes.xaml.cs">
+      <DependentUpon>AreaCheckBoxes.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\EquipmentCard.xaml.cs">
       <DependentUpon>EquipmentCard.xaml</DependentUpon>
     </Compile>
@@ -147,6 +150,10 @@
     <Compile Include="Views\ProjectsView.xaml.cs">
       <DependentUpon>ProjectsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\AreaCheckBoxes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\EquipmentCard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

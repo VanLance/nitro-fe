@@ -9,7 +9,7 @@ using Nitrogen_FrontEnd.Services.DatabaseService;
 
 namespace Nitrogen_FrontEnd
 {
-    class ExcelReader
+    public class ExcelReader
     {
         private string FilePath;
         static private ProjectService projectService;
@@ -19,6 +19,9 @@ namespace Nitrogen_FrontEnd
         private string ProjectNumber;
         private Project project;
         private Dictionary<string, int> ColumnNumbers = new Dictionary<string, int>();
+        public Dictionary<string, bool> SelectedAreas = new Dictionary<string, bool>();
+        Application excelApp;
+        Workbook workbook;
 
         public ExcelReader(string filePath)
         {
@@ -27,17 +30,33 @@ namespace Nitrogen_FrontEnd
             mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+
+            excelApp = new Application();
+            workbook = excelApp.Workbooks.Open(FilePath);
+
+            GenerateSelctedAreas();
+        }
+
+        public void GenerateSelctedAreas()
+        {
+            foreach (Worksheet worksheet in workbook.Sheets)
+            {
+                SelectedAreas.Add(worksheet.Name, false);
+            }
         }
 
         public void ReadExcelFile()
         {
-            Application excelApp = new Application();
-            Workbook workbook = excelApp.Workbooks.Open(FilePath);
+            foreach (var area in SelectedAreas)
+            {
+                Console.WriteLine($"{area.Key} area name\n");
+                Console.WriteLine($"{area.Value} area Selected\n");
+            }
 
             foreach (Worksheet worksheet in workbook.Sheets)
             {
                 string worksheetName = worksheet.Name;
-                if (worksheetName != "Notes")
+                if (SelectedAreas[worksheetName])
                 {
                     Range usedRange = worksheet.UsedRange;
                     int rowCount = usedRange.Rows.Count;
@@ -86,6 +105,7 @@ namespace Nitrogen_FrontEnd
 
         private void FindProjectNumber(Range cell, Range usedRange)
         {
+            Console.WriteLine($"Looking for proj number {cell.Value.ToString()}");
             if (cell.Value.ToString().Length >= 9)
             {
                 string checkString = cell.Value.ToString().Substring(0, 9);
@@ -98,7 +118,7 @@ namespace Nitrogen_FrontEnd
                         ProjectNumber = cell.Value.ToString().Substring(10),
                         Description = usedRange.Cells[cell.Row - 2, cell.Column].Value.ToString(),
                     };
-
+                    Console.WriteLine("Found project Number " + ProjectNumber);
                 }
             }
         }
@@ -106,6 +126,10 @@ namespace Nitrogen_FrontEnd
         private bool ProjectInDb()
         {
             return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
+        }
+        private bool AreaInDb()
+        {
+            return false;
         }
 
         private void AddColumnNumbers(Range cell, int columnCount)
@@ -128,7 +152,8 @@ namespace Nitrogen_FrontEnd
                     }
                     break;
             }
-            if (cell.Column == columnCount - 1)
+            Console.WriteLine($"{cell.Value.ToString()} cell value\n\n {ColumnNumbers.Count}, checking for!!!!!");
+            if (cell.Column == columnCount - 1 || (ColumnNumbers.Count > 1 && cell.Value == null))
             {
 
                 int dbExcelMapPk = AddEquipDbExcelMap();
