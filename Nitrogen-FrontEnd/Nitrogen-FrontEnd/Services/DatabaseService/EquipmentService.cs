@@ -56,6 +56,49 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService
             return equipmentList;
         }
 
+        public List<Equipment> GetEquipmentForArea(string projectNumber, string area)
+        {
+            Console.WriteLine($"area: {area}");
+            List<Equipment> equipmentList = new List<Equipment>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string equipmentQuery = $"SELECT * From Equipment WHERE ProjectNumber = @ProjectNumber AND Area = @Area";
+
+                using (SqlCommand command = new SqlCommand(equipmentQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@ProjectNumber", projectNumber);
+                    command.Parameters.AddWithValue("@Area", area);
+
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+
+                        Equipment equipment = new Equipment
+                        {
+                            Id = (int)reader["id"],
+                            ProjectNumber = reader["ProjectNumber"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            EquipmentId = reader["EquipmentId"].ToString(),
+                            EquipmentSubId = reader["EquipmentSubId"].ToString(),
+                            ControlPanel = reader["ControlPanel"] != DBNull.Value ? reader["ControlPanel"].ToString() : null,
+                            Area = reader["Area"].ToString(),
+                            Notes = reader["Notes"].ToString(),
+                            ParentEquipmentId = reader["ParentEquipmentId"] != DBNull.Value ? (int)reader["ParentEquipmentId"] : (int?)null,
+                            ExcelRowNumber = (int)reader["ExcelRowNumber"]
+                        };
+
+                        equipmentList.Add(equipment);
+                    }
+
+                    reader.Close();
+                }
+            }
+
+            return equipmentList;
+        }
+
         public Equipment GetSingleEquipmentById(int id)
         {
             Equipment equipment = null;

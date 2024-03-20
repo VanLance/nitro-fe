@@ -22,6 +22,7 @@ namespace Nitrogen_FrontEnd
         public Dictionary<string, bool> SelectedAreas = new Dictionary<string, bool>();
         Application excelApp;
         Workbook workbook;
+        string worksheetName;
 
         public ExcelReader(string filePath)
         {
@@ -55,7 +56,7 @@ namespace Nitrogen_FrontEnd
 
             foreach (Worksheet worksheet in workbook.Sheets)
             {
-                string worksheetName = worksheet.Name;
+                worksheetName = worksheet.Name;
                 if (SelectedAreas[worksheetName])
                 {
                     Range usedRange = worksheet.UsedRange;
@@ -77,11 +78,6 @@ namespace Nitrogen_FrontEnd
                                     }
                                     else
                                     {
-                                        if (ProjectInDb())
-                                        {
-                                            MessageBox.Show("Project Already Added!");
-                                            return;
-                                        }
                                         AddColumnNumbers(cell, columnCount);
                                     }
                                 }
@@ -127,14 +123,15 @@ namespace Nitrogen_FrontEnd
         {
             return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
         }
+
         private bool AreaInDb()
         {
-            return false;
+            List<Equipment> equipment = equipmentService.GetEquipmentForArea(ProjectNumber, worksheetName);
+            return equipment.Count > 0;
         }
 
         private void AddColumnNumbers(Range cell, int columnCount)
         {
-
             string cellValue = cell.Value.ToString().Trim().ToLower();
 
             switch (cellValue)
@@ -152,18 +149,23 @@ namespace Nitrogen_FrontEnd
                     }
                     break;
             }
-            Console.WriteLine($"{cell.Value.ToString()} cell value\n\n {ColumnNumbers.Count}, checking for!!!!!");
-            if (cell.Column == columnCount - 1 || (ColumnNumbers.Count > 1 && cell.Value == null))
+            if (ColumnNumbers.Count == 4) AddProjectToDb(cell, worksheetName);
+        }
+
+        private void AddProjectToDb(Range cell, string worksheetName)
+        {
+            if (ProjectInDb() && AreaInDb())
             {
-
-                int dbExcelMapPk = AddEquipDbExcelMap();
-
-                int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
-
-                project.EquipSheetFormatId = sheetFormatPk;
-                projectService.AddProject(project);
-
+                MessageBox.Show("Area Already in Databse");
+                Console.Write("Area Already in Databse");
+                return;
             }
+            int dbExcelMapPk = AddEquipDbExcelMap();
+
+            int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
+
+            project.EquipSheetFormatId = sheetFormatPk;
+            projectService.AddProject(project);
         }
 
         private int AddEquipDbExcelMap()
