@@ -10,7 +10,7 @@
     Height="450"
     Width="800">
     <Grid
-        Margin="10">
+        Margin="10, 30, 10, 0">
 
         <Grid.RowDefinitions>
             <RowDefinition

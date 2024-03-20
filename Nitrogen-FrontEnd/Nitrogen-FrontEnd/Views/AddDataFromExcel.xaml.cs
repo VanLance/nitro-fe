@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Nitrogen_FrontEnd.Controls;
+using System.Linq;
 using System.Windows;
 using Page = System.Windows.Controls.Page;
 
@@ -33,7 +34,10 @@ namespace Nitrogen_FrontEnd.Views
             if (txtFilePath.Text != "")
             {
                 ExcelReader = new ExcelReader(txtFilePath.Text);
-                
+
+                AreaCheckBoxes existingCheckBoxes = stackPanel.Children.OfType<AreaCheckBoxes>().FirstOrDefault();
+                if (existingCheckBoxes != null) stackPanel.Children.Remove(existingCheckBoxes);
+
                 areaCheckBoxes = new AreaCheckBoxes(ExcelReader, stackPanel);
                 stackPanel.Children.Add(areaCheckBoxes);
             }

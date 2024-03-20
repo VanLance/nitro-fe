@@ -10,11 +10,11 @@
     Title="AddDataFromExcel"
     Height="450"
     Width="800">
-    <Grid>
+    <Grid
+        Margin="50, 30, 50, 0">
         
         <StackPanel
-            x:Name="stackPanel"
-            Margin="50">
+            x:Name="stackPanel">
             <Button
                 x:Name="BrowseBtn"
                 Content="Browse Excel File"

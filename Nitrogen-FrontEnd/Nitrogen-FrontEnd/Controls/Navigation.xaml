@@ -20,5 +20,9 @@
             Content="Projects View"
             Click="Projects_Click" 
             Margin="10 5"/>
+        <Button
+            Content="Search"
+            Click="Search_Click"
+            Margin="10 5" />
     </StackPanel>
 </UserControl>

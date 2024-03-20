@@ -141,6 +141,9 @@
     <Compile Include="Views\EquipmentFamilyView.xaml.cs">
       <DependentUpon>EquipmentFamilyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SearchView.xaml.cs">
+      <DependentUpon>SearchView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SingleEquipmentView.xaml.cs">
       <DependentUpon>SingleEquipmentView.xaml</DependentUpon>
     </Compile>
@@ -179,6 +182,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EquipmentFamilyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SearchView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

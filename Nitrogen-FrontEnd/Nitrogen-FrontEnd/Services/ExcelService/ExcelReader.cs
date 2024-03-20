@@ -48,15 +48,11 @@ namespace Nitrogen_FrontEnd
 
         public void ReadExcelFile()
         {
-            foreach (var area in SelectedAreas)
-            {
-                Console.WriteLine($"{area.Key} area name\n");
-                Console.WriteLine($"{area.Value} area Selected\n");
-            }
 
             foreach (Worksheet worksheet in workbook.Sheets)
             {
                 worksheetName = worksheet.Name;
+                bool isAreaInDbChecked = false;
                 if (SelectedAreas[worksheetName])
                 {
                     Range usedRange = worksheet.UsedRange;
@@ -65,6 +61,18 @@ namespace Nitrogen_FrontEnd
 
                     for (int y = 1; y <= rowCount; y++)
                     {
+                        Console.WriteLine(isAreaInDbChecked + "IS AREA CHECKEC");
+                        if (!isAreaInDbChecked && ProjectNumber != null)
+                        {
+                            isAreaInDbChecked = true;
+                            if (IsAreaInDb())
+                            {
+                                isAreaInDbChecked = true;
+                                MessageBox.Show("Area Already in Databse");
+                                Console.Write("Area Already in Database");
+                                break;
+                            }
+                        }
                         if (ColumnNumbers.Count == 0)
                         {
                             for (int x = 1; x <= columnCount; x++)
@@ -101,7 +109,6 @@ namespace Nitrogen_FrontEnd
 
         private void FindProjectNumber(Range cell, Range usedRange)
         {
-            Console.WriteLine($"Looking for proj number {cell.Value.ToString()}");
             if (cell.Value.ToString().Length >= 9)
             {
                 string checkString = cell.Value.ToString().Substring(0, 9);
@@ -119,14 +126,15 @@ namespace Nitrogen_FrontEnd
             }
         }
 
-        private bool ProjectInDb()
+        private bool IsProjectInDb()
         {
             return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
         }
 
-        private bool AreaInDb()
+        private bool IsAreaInDb()
         {
             List<Equipment> equipment = equipmentService.GetEquipmentForArea(ProjectNumber, worksheetName);
+            Console.WriteLine("Checking area equip count \n\n" + equipment.Count);
             return equipment.Count > 0;
         }
 
@@ -154,12 +162,6 @@ namespace Nitrogen_FrontEnd
 
         private void AddProjectToDb(Range cell, string worksheetName)
         {
-            if (ProjectInDb() && AreaInDb())
-            {
-                MessageBox.Show("Area Already in Databse");
-                Console.Write("Area Already in Databse");
-                return;
-            }
             int dbExcelMapPk = AddEquipDbExcelMap();
 
             int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
@@ -213,12 +215,11 @@ namespace Nitrogen_FrontEnd
             if (equipCell.Value != null)
             {
                 Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
-                if (equipmentService.GetSingleEquipmentByIdsAndProjectNumber(ids["id"], ids.ContainsKey("subId") ? ids["subId"] : null, ProjectNumber) == null)
-                {
-                    Console.WriteLine(equipCell.Value.ToString());
-                    Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
-                    equipmentService.AddEquipment(equipment);
-                }
+
+                Console.WriteLine(equipCell.Value.ToString());
+                Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
+
+                equipmentService.AddEquipment(equipment);
             }
         }
 
