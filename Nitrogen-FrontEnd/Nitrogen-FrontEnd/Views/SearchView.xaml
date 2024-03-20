@@ -34,7 +34,8 @@
                 x:Name="projectComboBox"
                 Width="200"
                 Height="25"
-                Margin="5,0,0,0">
+                Margin="5,0,0,0"
+                DisplayMemberPath="Description">
             </ComboBox>
         </StackPanel>
 
@@ -66,7 +67,8 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center" 
             Grid.Row="2"
-            Width="100"/>
+            Height="25"
+            Width="150"/>
         
         <Button
             Content="Search"

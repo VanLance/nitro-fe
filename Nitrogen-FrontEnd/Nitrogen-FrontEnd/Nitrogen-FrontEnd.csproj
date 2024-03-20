@@ -123,6 +123,9 @@
     <Compile Include="Controls\EquipmentCard.xaml.cs">
       <DependentUpon>EquipmentCard.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\EquipmentView.xaml.cs">
+      <DependentUpon>EquipmentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Navigation.xaml.cs">
       <DependentUpon>Navigation.xaml</DependentUpon>
     </Compile>
@@ -134,6 +137,7 @@
     <Compile Include="Services\DatabaseService\ProjectService.cs" />
     <Compile Include="Services\ExcelService\ExcelWriter.cs" />
     <Compile Include="Utilities\EquipmentUpdater.cs" />
+    <Compile Include="Utilities\EquipmentUtility.cs" />
     <Compile Include="Utilities\ExcelWriterGenerator.cs" />
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
       <DependentUpon>AddDataFromExcel.xaml</DependentUpon>
@@ -158,6 +162,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\EquipmentCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\EquipmentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

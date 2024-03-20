@@ -57,7 +57,7 @@ namespace Nitrogen_FrontEnd.Views
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            // Handle the submit button click event here
+  
             if (actionComboBox.SelectedItem != null)
             {
                 string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
