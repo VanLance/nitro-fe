@@ -123,9 +123,6 @@
     <Compile Include="Controls\EquipmentCard.xaml.cs">
       <DependentUpon>EquipmentCard.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\EquipmentView.xaml.cs">
-      <DependentUpon>EquipmentView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\Navigation.xaml.cs">
       <DependentUpon>Navigation.xaml</DependentUpon>
     </Compile>
@@ -145,6 +142,9 @@
     <Compile Include="Views\EquipmentFamilyView.xaml.cs">
       <DependentUpon>EquipmentFamilyView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EquipmentView.xaml.cs">
+      <DependentUpon>EquipmentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SearchView.xaml.cs">
       <DependentUpon>SearchView.xaml</DependentUpon>
     </Compile>
@@ -162,10 +162,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\EquipmentCard.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\EquipmentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -190,6 +186,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EquipmentFamilyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EquipmentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

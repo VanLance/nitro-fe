@@ -15,7 +15,7 @@ namespace Nitrogen_FrontEnd.Views
     {
         private readonly ProjectService ProjectService;
         private readonly EquipmentService EquipmentService;
-        private List<Equipment> Equipment;
+        private List<Equipment> EquipmentList;
 
         public SearchView()
         {
@@ -42,21 +42,43 @@ namespace Nitrogen_FrontEnd.Views
             switch (searchBy)
             {
                 case "Family Id":
-                    Equipment = EquipmentService.GetEquipmentFamily(searchInput.Text, projectNumber);
+                    ViewEquipmentFamily(searchInput.Text, projectNumber);
                     break;
                 case "Equipment List #":
-                    var equipmentIds = EquipmentUtility.ExtractEquipmentIdAndSubId(searchInput.Text);
-                    Equipment = new List<Equipment>()
-                    {
-                        EquipmentService.GetSingleEquipmentByIdsAndProjectNumber(equipmentIds["id"], equipmentIds["subId"], projectNumber)
-                    };
+                    ViewEquipmentCard(searchInput.Text, projectNumber);
                     break;
                 case "Area":
-                    Equipment = EquipmentService.GetEquipmentForArea(projectNumber, searchInput.Text);
+                    ViewEquipmentArea(searchInput.Text, projectNumber);
                     break;
                 case "Description":
                     break;
             }
+        }
+
+        private void ViewEquipmentFamily(string equipmentId, string projectNumber)
+        {
+            EquipmentList = EquipmentService.GetEquipmentFamily(searchInput.Text, projectNumber);
+
+            EquipmentView equipmentView = new EquipmentView(EquipmentList, projectNumber, $"Equipment Family: {equipmentId}");
+            NavigationService.Navigate(equipmentView);
+        }
+
+        private void ViewEquipmentCard(string equipmentId, string projectNumber)
+        {
+
+            var equipmentIds = EquipmentUtility.ExtractEquipmentIdAndSubId(equipmentId);
+            Equipment equipment = EquipmentService.GetSingleEquipmentByIdsAndProjectNumber(equipmentIds["id"], equipmentIds["subId"], projectNumber);
+
+            SingleEquipmentView singleEquipmentView = new SingleEquipmentView(equipment.Id);
+            NavigationService.Navigate(singleEquipmentView);
+        }
+
+        private void ViewEquipmentArea(string area, string projectNumber)
+        {
+            EquipmentList = EquipmentService.GetEquipmentForArea(projectNumber, area);
+
+            EquipmentView EquipmentView = new EquipmentView(EquipmentList, projectNumber, $"Area: {area} Equpiment");
+            NavigationService.Navigate(EquipmentView);
         }
     }
 }

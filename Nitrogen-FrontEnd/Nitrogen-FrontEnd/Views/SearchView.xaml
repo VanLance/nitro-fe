@@ -55,7 +55,7 @@
                 <ComboBoxItem
                     Content="Family Id" />
                 <ComboBoxItem
-                    Content="Equipment Id" />
+                    Content="Equipment List #" />
                 <ComboBoxItem
                     Content="Area" />
             </ComboBox>

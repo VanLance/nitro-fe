@@ -10,52 +10,46 @@ using System.Windows.Controls;
 namespace Nitrogen_FrontEnd.Views
 {
     /// <summary>
-    /// Interaction logic for ProjectEquipmentView.xaml
+    /// Interaction logic for EquipmentView.xaml
     /// </summary>
-    public partial class ProjectEquipmentView : Page
+    public partial class EquipmentView : Page
     {
         private readonly ProjectService projectService;
         private readonly EquipmentService equipmentService;
         private readonly EquipmentSheetFormatService sheetFormatService;
         private readonly MappingService mappingService;
         private ExcelWriter ExcelWriter;
-        private readonly Project project; 
+        private readonly Project project;
         private EquipSheetFormat sheetFormat;
         private readonly string projectNumber;
+        private readonly string title;
+        private readonly List<Equipment> equipmentList;
 
-        public ProjectEquipmentView(string projectNumber)
+        public EquipmentView(List<Equipment> equipmentList, string projectNumber, string title)
         {
             InitializeComponent();
-
+            this.equipmentList = equipmentList;
             this.projectNumber = projectNumber;
+            this.title = title;
             projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             project = projectService.GetProjectByProjectNumber(projectNumber);
             sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
-
             ShowEquipment();
         }
 
-        private void ShowEquipment()
+        public void ShowEquipment()
         {
-            try
-            {
-                List<Equipment> equipmentDataList = equipmentService.GetEquipmentForProject(projectNumber); ;
-
-                equipmentGrid.ItemsSource = equipmentDataList;
-                equipmentGrid.SelectedValuePath = "Id";
-                equipmentGrid.AutoGenerateColumns = true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
+            equipmentGrid.ItemsSource = equipmentList;
+            equipmentGrid.SelectedValuePath = "EquipmentId";
+            equipmentGrid.AutoGenerateColumns = true;
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
+
             if (actionComboBox.SelectedItem != null)
             {
                 string selectedAction = (actionComboBox.SelectedItem as ComboBoxItem).Content.ToString();
@@ -73,34 +67,18 @@ namespace Nitrogen_FrontEnd.Views
                     case "Update Spreadsheet":
                         UpdateSpreadsheet();
                         break;
-                    case "View Equipment Family":
-                        ViewEquipmentFamily();
-                        break;
                 }
-            }
-        }
-
-        private void ViewEquipmentFamily()
-        {
-            object selectedId = equipmentGrid.SelectedValue;
-            if (selectedId != null)
-            {
-                Equipment selectedEquipment = (Equipment)equipmentGrid.SelectedItem;
-                EquipmentFamilyView equipmentFamilyView = new EquipmentFamilyView(selectedEquipment.EquipmentId, selectedEquipment.ProjectNumber);
-                NavigationService.Navigate(equipmentFamilyView);
-            }
-            else
-            {
-                MessageBox.Show("Please Select Equipment");
             }
         }
 
         private void ViewEquipmentCard()
         {
             object selectedId = equipmentGrid.SelectedValue;
+
             if (selectedId != null)
             {
-                SingleEquipmentView singleEquipmentView = new SingleEquipmentView((int)selectedId);
+                Equipment equipment = (Equipment)equipmentGrid.SelectedItem;
+                SingleEquipmentView singleEquipmentView = new SingleEquipmentView(equipment.Id);
                 NavigationService.Navigate(singleEquipmentView);
             }
             else
@@ -151,3 +129,4 @@ namespace Nitrogen_FrontEnd.Views
         }
     }
 }
+

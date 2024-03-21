@@ -61,7 +61,6 @@ namespace Nitrogen_FrontEnd
 
                     for (int y = 1; y <= rowCount; y++)
                     {
-                        Console.WriteLine(isAreaInDbChecked + "IS AREA CHECKEC");
                         if (!isAreaInDbChecked && ProjectNumber != null)
                         {
                             isAreaInDbChecked = true;
@@ -212,9 +211,9 @@ namespace Nitrogen_FrontEnd
         private void AddEquipmentFromRow(Range usedRange, int row)
         {
             Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
-            if (equipCell.Value != null)
+            if (equipCell.Value != null && equipCell.Value.ToString() != "Equip List #")
             {
-                Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(usedRange.Cells[row, ColumnNumbers["equip list #"]].Value?.ToString());
+                Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(equipCell.Value?.ToString());
 
                 Console.WriteLine(equipCell.Value.ToString());
                 Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
