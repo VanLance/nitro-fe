@@ -3,6 +3,7 @@ using Nitrogen_FrontEnd.Services;
 using Nitrogen_FrontEnd.Services.DatabaseService;
 using Nitrogen_FrontEnd.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,8 @@ namespace Nitrogen_FrontEnd.Views
     public partial class ProjectsView : Page
     {
 
+
+        private readonly EquipmentService EquipmentService;
         private readonly ProjectService projectService;
 
         public ProjectsView()
@@ -23,6 +26,7 @@ namespace Nitrogen_FrontEnd.Views
             InitializeComponent();
 
             projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            EquipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
 
             ShowProjects();
         }
@@ -75,7 +79,11 @@ namespace Nitrogen_FrontEnd.Views
             var selectedProjectNumber = projectGrid.SelectedValue;
             if (selectedProjectNumber != null)
             {
-                ProjectEquipmentView projectEquipmentView = new ProjectEquipmentView(projectGrid.SelectedValue.ToString());
+                string projectNumber = projectGrid.SelectedValue.ToString();
+                Project project = (Project)projectGrid.SelectedItem;
+                List<Equipment> equipmentList = EquipmentService.GetEquipmentForProject(projectNumber);
+
+                EquipmentView projectEquipmentView = new EquipmentView(equipmentList, projectNumber, $"Project: {project.Description} Equipment");
 
                 NavigationService.Navigate(projectEquipmentView);
             }

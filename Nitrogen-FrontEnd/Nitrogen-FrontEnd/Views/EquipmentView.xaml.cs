@@ -67,6 +67,9 @@ namespace Nitrogen_FrontEnd.Views
                     case "Update Spreadsheet":
                         UpdateSpreadsheet();
                         break;
+                    case "View Equipment Family":
+                        ViewEquipmentFamily();
+                        break;
                 }
             }
         }
@@ -80,6 +83,24 @@ namespace Nitrogen_FrontEnd.Views
                 Equipment equipment = (Equipment)equipmentGrid.SelectedItem;
                 SingleEquipmentView singleEquipmentView = new SingleEquipmentView(equipment.Id);
                 NavigationService.Navigate(singleEquipmentView);
+            }
+            else
+            {
+                MessageBox.Show("Please Select Equipment");
+            }
+        }
+
+        private void ViewEquipmentFamily()
+        {
+            object selectedId = equipmentGrid.SelectedValue;
+            if (selectedId != null)
+            {
+                Equipment selectedEquipment = (Equipment)equipmentGrid.SelectedItem;
+
+                List<Equipment> equipmentList = equipmentService.GetEquipmentFamily(selectedEquipment.EquipmentId, projectNumber);
+
+                EquipmentView equipmentFamilyView = new EquipmentView(equipmentList, selectedEquipment.ProjectNumber, $"Equipment Family: {selectedEquipment.EquipmentId}");
+                NavigationService.Navigate(equipmentFamilyView);
             }
             else
             {

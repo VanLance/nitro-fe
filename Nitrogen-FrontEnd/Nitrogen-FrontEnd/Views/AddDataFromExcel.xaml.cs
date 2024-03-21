@@ -29,7 +29,7 @@ namespace Nitrogen_FrontEnd.Views
             }
         }
 
-        public void HandleImportBtnClick(object sender, RoutedEventArgs e)
+        public void HandleSelectBtnClick(object sender, RoutedEventArgs e)
         {
             if (txtFilePath.Text != "")
             {

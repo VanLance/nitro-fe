@@ -1,7 +1,9 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using CheckBox = System.Windows.Controls.CheckBox;
 
 namespace Nitrogen_FrontEnd.Controls
@@ -30,18 +32,23 @@ namespace Nitrogen_FrontEnd.Controls
                 {
                     Content = area,
                 };
+                checkBox.Foreground = Brushes.White;
                 AreaCheckBoxStackPanel.Children.Add(checkBox);
             }
         }
 
-        public void UpdateSelectedAreas_Click(object sender, RoutedEventArgs e)
+        public async void UpdateSelectedAreas_Click(object sender, RoutedEventArgs e)
         {
-            foreach( CheckBox checkBox in AreaCheckBoxStackPanel.Children)
+            foreach (CheckBox checkBox in AreaCheckBoxStackPanel.Children)
             {
                 ExcelReader.SelectedAreas[checkBox.Content.ToString()] = checkBox.IsChecked ?? false;
             }
-            ExcelReader.ReadExcelFile();
+            progressBar.Visibility = Visibility.Visible;
+
+            await Task.Run(() => ExcelReader.ReadExcelFile(progressBar));
             StackPanel.Children.Remove(this);
+
+            progressBar.Visibility = Visibility.Collapsed;
         }
     }
 }

@@ -11,18 +11,22 @@
     VerticalAlignment="Top">
     <StackPanel
         Orientation="Horizontal"
-        Background="LightGray">
+        Background="LightGray"
+        HorizontalAlignment="Stretch">
         <Button
             Content="Add Data From Excel"
             Click="AddData_Click" 
-            Margin="10 5"/>
+            Margin="10 5"
+            Padding="5 0"/>
         <Button
             Content="Projects View"
             Click="Projects_Click" 
-            Margin="10 5"/>
+            Margin="10 5"
+            Padding="5 0"/>
         <Button
             Content="Search"
             Click="Search_Click"
-            Margin="10 5" />
+            Margin="10 5" 
+            Padding="5 0"/>
     </StackPanel>
 </UserControl>

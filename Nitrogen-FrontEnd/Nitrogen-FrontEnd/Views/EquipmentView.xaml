@@ -54,6 +54,8 @@
                 <ComboBoxItem
                     Content="View Equipment Card" />
                 <ComboBoxItem
+                    Content="View Equipment Family" />
+                <ComboBoxItem
                     Content="Update Database" />
                 <ComboBoxItem
                     Content="Update Spreadsheet" />

@@ -9,7 +9,7 @@
     Title="MainWindow"
     Height="500"
     Width="950">
-    <Grid>
+    <Grid Background="Black" >
 
         <controls:Navigation
             NavigationService="{Binding ElementName=MainFrame, Path=NavigationService}" />

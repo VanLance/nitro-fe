@@ -45,7 +45,9 @@ namespace Nitrogen_FrontEnd.Views
 
         private void ViewEquipmentFamily_Click(object sender, RoutedEventArgs e)
         {
-            EquipmentFamilyView equipmentFamilyView = new EquipmentFamilyView(equipment.EquipmentId.ToString(), equipment.ProjectNumber);
+            List<Equipment> equipmentList = databaseService.GetEquipmentFamily(equipment.EquipmentId, equipment.ProjectNumber);
+
+            EquipmentView equipmentFamilyView = new EquipmentView(equipmentList, equipment.ProjectNumber, $"Equipment Family: {equipment.EquipmentId} Equipment");
             NavigationService.Navigate(equipmentFamilyView);
         }
     }
