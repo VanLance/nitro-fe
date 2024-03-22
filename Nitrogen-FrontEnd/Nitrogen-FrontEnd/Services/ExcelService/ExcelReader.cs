@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Application = Microsoft.Office.Interop.Excel.Application;
 using Nitrogen_FrontEnd.Services.DatabaseService;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Nitrogen_FrontEnd
 {
@@ -47,7 +48,7 @@ namespace Nitrogen_FrontEnd
             }
         }
 
-        public void ReadExcelFile(ProgressBar progressBar)
+        public void ReadExcelFile(ProgressBar progressBar, Dispatcher dispatcher)
         {
 
             foreach (Worksheet worksheet in workbook.Sheets)
@@ -60,234 +61,236 @@ namespace Nitrogen_FrontEnd
                     int rowCount = usedRange.Rows.Count;
                     int columnCount = usedRange.Columns.Count;
 
+                    progressBar.Value =  0;
+
                     for (int y = 1; y <= rowCount; y++)
                     {
-                        progressBar.Value = (y / rowCount) * 100;
-                    if (!isAreaInDbChecked && ProjectNumber != null)
-                    {
-                        isAreaInDbChecked = true;
-                        if (IsAreaInDb())
+                        dispatcher.Invoke(() => progressBar.Value = (y / rowCount) * 100);
+                        
+                        if (!isAreaInDbChecked && ProjectNumber != null)
                         {
                             isAreaInDbChecked = true;
-                            MessageBox.Show("Area Already in Databse");
-                            Console.Write("Area Already in Database");
-                            break;
-                        }
-                    }
-                    if (ColumnNumbers.Count == 0)
-                    {
-                        for (int x = 1; x <= columnCount; x++)
-                        {
-                            Range cell = usedRange.Cells[y, x];
-                            if (cell.Value != null)
+                            if (IsAreaInDb())
                             {
-                                if (ProjectNumber == null)
+                                MessageBox.Show("Area Already in Databse");
+                                Console.Write("Area Already in Database");
+                                break;
+                            }
+                        }
+                        if (ColumnNumbers.Count == 0)
+                        {
+                            for (int x = 1; x <= columnCount; x++)
+                            {
+                                Range cell = usedRange.Cells[y, x];
+                                if (cell.Value != null)
                                 {
-                                    FindProjectNumber(cell, usedRange);
-                                }
-                                else
-                                {
-                                    AddColumnNumbers(cell, columnCount);
+                                    if (ProjectNumber == null)
+                                    {
+                                        FindProjectNumber(cell, usedRange);
+                                    }
+                                    else
+                                    {
+                                        AddColumnNumbers(cell, columnCount);
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            AddEquipmentFromRow(usedRange, y);
+                        }
                     }
-                    else
-                    {
-                        AddEquipmentFromRow(usedRange, y);
-                    }
-                }
 
-                ReleaseObject(worksheet);
+                    ReleaseObject(worksheet);
+                }
             }
-        }
-        workbook.Close(false);
+            workbook.Close(false);
             excelApp.Quit();
             ReleaseObject(workbook);
-        ReleaseObject(excelApp);
-        MessageBox.Show("Complete");
+            ReleaseObject(excelApp);
+            MessageBox.Show("Complete");
         }
 
-    private void FindProjectNumber(Range cell, Range usedRange)
-    {
-        if (cell.Value.ToString().Length >= 9)
+        private void FindProjectNumber(Range cell, Range usedRange)
         {
-            string checkString = cell.Value.ToString().Substring(0, 9);
-            if (checkString.ToLower() == "project #")
+            if (cell.Value.ToString().Length >= 9)
             {
-                ProjectNumber = cell.Value.ToString().Substring(10);
-
-                project = new Project
+                string checkString = cell.Value.ToString().Substring(0, 9);
+                if (checkString.ToLower() == "project #")
                 {
-                    ProjectNumber = cell.Value.ToString().Substring(10),
-                    Description = usedRange.Cells[cell.Row - 2, cell.Column].Value.ToString(),
-                };
-                Console.WriteLine("Found project Number " + ProjectNumber);
+                    ProjectNumber = cell.Value.ToString().Substring(10);
+
+                    project = new Project
+                    {
+                        ProjectNumber = cell.Value.ToString().Substring(10),
+                        Description = usedRange.Cells[cell.Row - 2, cell.Column].Value.ToString(),
+                    };
+                    Console.WriteLine("Found project Number " + ProjectNumber);
+                }
             }
         }
-    }
 
-    private bool IsProjectInDb()
-    {
-        return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
-    }
-
-    private bool IsAreaInDb()
-    {
-        List<Equipment> equipment = equipmentService.GetEquipmentForArea(ProjectNumber, worksheetName);
-        Console.WriteLine("Checking area equip count \n\n" + equipment.Count);
-        return equipment.Count > 0;
-    }
-
-    private void AddColumnNumbers(Range cell, int columnCount)
-    {
-        string cellValue = cell.Value.ToString().Trim().ToLower();
-
-        switch (cellValue)
+        private bool IsProjectInDb()
         {
-            case "comments":
-                ColumnNumbers["notes"] = cell.Column;
-                break;
-            case "equip list #":
-            case "associated control panel":
-            case "description":
-            case "notes":
-                if (!ColumnNumbers.ContainsKey(cellValue))
-                {
-                    ColumnNumbers[cellValue] = cell.Column;
-                }
-                break;
+            return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
         }
-        if (ColumnNumbers.Count == 4) AddProjectToDb(cell, worksheetName);
-    }
 
-    private void AddProjectToDb(Range cell, string worksheetName)
-    {
-        int dbExcelMapPk = AddEquipDbExcelMap();
-
-        int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
-
-        project.EquipSheetFormatId = sheetFormatPk;
-        projectService.AddProject(project);
-    }
-
-    private int AddEquipDbExcelMap()
-    {
-        EquipDbFieldToExcelColumnMap dbToExcelMap = new EquipDbFieldToExcelColumnMap();
-        foreach (var entry in ColumnNumbers)
+        private bool IsAreaInDb()
         {
-            switch (entry.Key)
+            List<Equipment> equipment = equipmentService.GetEquipmentForArea(ProjectNumber, worksheetName);
+            Console.WriteLine("Checking area equip count \n\n" + equipment.Count);
+            return equipment.Count > 0;
+        }
+
+        private void AddColumnNumbers(Range cell, int columnCount)
+        {
+            string cellValue = cell.Value.ToString().Trim().ToLower();
+
+            switch (cellValue)
             {
-                case "notes":
                 case "comments":
-                    dbToExcelMap.Notes = entry.Value;
+                    ColumnNumbers["notes"] = cell.Column;
                     break;
                 case "equip list #":
-                    dbToExcelMap.EquipListNumber = entry.Value;
-                    break;
                 case "associated control panel":
-                    dbToExcelMap.ControlPanel = entry.Value;
-                    break;
                 case "description":
-                    dbToExcelMap.Description = entry.Value;
+                case "notes":
+                    if (!ColumnNumbers.ContainsKey(cellValue))
+                    {
+                        ColumnNumbers[cellValue] = cell.Column;
+                    }
                     break;
             }
-        }
-        int dbExcelMapPk = mappingService.AddEquipDbFieldToExcelColumnMap(dbToExcelMap);
-        return dbExcelMapPk;
-    }
-
-    private int AddEquipSheetFormat(Range cell, int dbExcelMapPk)
-    {
-        EquipSheetFormat sheetFormat = new EquipSheetFormat()
-        {
-            FileName = FilePath,
-            StartingDataLine = cell.Row + 1,
-            EquipDbFieldToExcelColumnMapId = dbExcelMapPk,
-        };
-
-        int sheetFormatPK = sheetFormatService.AddEquipSheetFormat(sheetFormat);
-        return sheetFormatPK;
-    }
-
-    private void AddEquipmentFromRow(Range usedRange, int row)
-    {
-        Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
-        if (equipCell.Value != null && equipCell.Value.ToString() != "Equip List #")
-        {
-            Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(equipCell.Value?.ToString());
-
-            Console.WriteLine(equipCell.Value.ToString());
-            Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
-
-            equipmentService.AddEquipment(equipment);
-        }
-    }
-
-    private Equipment CreateEquipmentFromRow(Range usedRange, int row, Dictionary<string, string> ids)
-    {
-        Equipment equipment = new Equipment
-        {
-            ProjectNumber = ProjectNumber,
-            Area = usedRange.Parent.Name,
-            EquipmentId = ids["id"],
-            ExcelRowNumber = row,
-        };
-
-        if (ids.ContainsKey("subId"))
-        {
-            equipment.EquipmentSubId = ids["subId"];
-        };
-
-        if (usedRange.Cells[row, ColumnNumbers["description"]].Value != null)
-        {
-            equipment.Description = usedRange.Cells[row, ColumnNumbers["description"]].Value?.ToString();
-        }
-        if (usedRange.Cells[row, ColumnNumbers["associated control panel"]].Value != null)
-        {
-            equipment.ControlPanel = usedRange.Cells[row, ColumnNumbers["associated control panel"]]?.Value.ToString();
-        }
-        if (usedRange.Cells[row, ColumnNumbers["notes"]].Value != null)
-        {
-            equipment.Notes = usedRange.Cells[row, ColumnNumbers["notes"]]?.Value.ToString();
+            if (ColumnNumbers.Count == 4) AddProjectToDb(cell, worksheetName);
         }
 
-        return equipment;
-    }
+        private void AddProjectToDb(Range cell, string worksheetName)
+        {
+            int dbExcelMapPk = AddEquipDbExcelMap();
 
-    private Dictionary<string, string> ExtractEquipmentIdAndSubId(string equipmentListNum)
-    {
-        string[] ids = equipmentListNum.Split('.');
+            int sheetFormatPk = AddEquipSheetFormat(cell, dbExcelMapPk);
 
-        Dictionary<string, string> idDict = new Dictionary<string, string>()
+            project.EquipSheetFormatId = sheetFormatPk;
+            projectService.AddProject(project);
+        }
+
+        private int AddEquipDbExcelMap()
+        {
+            EquipDbFieldToExcelColumnMap dbToExcelMap = new EquipDbFieldToExcelColumnMap();
+            foreach (var entry in ColumnNumbers)
+            {
+                switch (entry.Key)
+                {
+                    case "notes":
+                    case "comments":
+                        dbToExcelMap.Notes = entry.Value;
+                        break;
+                    case "equip list #":
+                        dbToExcelMap.EquipListNumber = entry.Value;
+                        break;
+                    case "associated control panel":
+                        dbToExcelMap.ControlPanel = entry.Value;
+                        break;
+                    case "description":
+                        dbToExcelMap.Description = entry.Value;
+                        break;
+                }
+            }
+            int dbExcelMapPk = mappingService.AddEquipDbFieldToExcelColumnMap(dbToExcelMap);
+            return dbExcelMapPk;
+        }
+
+        private int AddEquipSheetFormat(Range cell, int dbExcelMapPk)
+        {
+            EquipSheetFormat sheetFormat = new EquipSheetFormat()
+            {
+                FileName = FilePath,
+                StartingDataLine = cell.Row + 1,
+                EquipDbFieldToExcelColumnMapId = dbExcelMapPk,
+            };
+
+            int sheetFormatPK = sheetFormatService.AddEquipSheetFormat(sheetFormat);
+            return sheetFormatPK;
+        }
+
+        private void AddEquipmentFromRow(Range usedRange, int row)
+        {
+            Range equipCell = usedRange.Cells[row, ColumnNumbers["equip list #"]];
+            if (equipCell.Value != null && equipCell.Value.ToString() != "Equip List #")
+            {
+                Dictionary<string, string> ids = ExtractEquipmentIdAndSubId(equipCell.Value?.ToString());
+
+                Console.WriteLine(equipCell.Value.ToString());
+                Equipment equipment = CreateEquipmentFromRow(usedRange, row, ids);
+
+                equipmentService.AddEquipment(equipment);
+            }
+        }
+
+        private Equipment CreateEquipmentFromRow(Range usedRange, int row, Dictionary<string, string> ids)
+        {
+            Equipment equipment = new Equipment
+            {
+                ProjectNumber = ProjectNumber,
+                Area = usedRange.Parent.Name,
+                EquipmentId = ids["id"],
+                ExcelRowNumber = row,
+            };
+
+            if (ids.ContainsKey("subId"))
+            {
+                equipment.EquipmentSubId = ids["subId"];
+            };
+
+            if (usedRange.Cells[row, ColumnNumbers["description"]].Value != null)
+            {
+                equipment.Description = usedRange.Cells[row, ColumnNumbers["description"]].Value?.ToString();
+            }
+            if (usedRange.Cells[row, ColumnNumbers["associated control panel"]].Value != null)
+            {
+                equipment.ControlPanel = usedRange.Cells[row, ColumnNumbers["associated control panel"]]?.Value.ToString();
+            }
+            if (usedRange.Cells[row, ColumnNumbers["notes"]].Value != null)
+            {
+                equipment.Notes = usedRange.Cells[row, ColumnNumbers["notes"]]?.Value.ToString();
+            }
+
+            return equipment;
+        }
+
+        private Dictionary<string, string> ExtractEquipmentIdAndSubId(string equipmentListNum)
+        {
+            string[] ids = equipmentListNum.Split('.');
+
+            Dictionary<string, string> idDict = new Dictionary<string, string>()
             {
                 { "id" , ids[0] },
             };
 
-        if (ids.Length > 1 && ids[1] != "0" && ids[1] != "00")
-        {
-            idDict.Add("subId", ids[1]);
-        };
+            if (ids.Length > 1 && ids[1] != "0" && ids[1] != "00")
+            {
+                idDict.Add("subId", ids[1]);
+            };
 
-        return idDict;
-    }
+            return idDict;
+        }
 
-    private void ReleaseObject(object obj)
-    {
-        try
+        private void ReleaseObject(object obj)
         {
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-            obj = null;
-        }
-        catch (Exception ex)
-        {
-            obj = null;
-            Console.WriteLine("Exception Occurred while releasing object " + ex.ToString());
-        }
-        finally
-        {
-            GC.Collect();
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                obj = null;
+                Console.WriteLine("Exception Occurred while releasing object " + ex.ToString());
+            }
+            finally
+            {
+                GC.Collect();
+            }
         }
     }
-}
 }

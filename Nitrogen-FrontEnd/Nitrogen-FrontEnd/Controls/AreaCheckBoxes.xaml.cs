@@ -45,7 +45,7 @@ namespace Nitrogen_FrontEnd.Controls
             }
             progressBar.Visibility = Visibility.Visible;
 
-            await Task.Run(() => ExcelReader.ReadExcelFile(progressBar));
+            await Task.Run(() => ExcelReader.ReadExcelFile(progressBar, Dispatcher));
             StackPanel.Children.Remove(this);
 
             progressBar.Visibility = Visibility.Collapsed;
