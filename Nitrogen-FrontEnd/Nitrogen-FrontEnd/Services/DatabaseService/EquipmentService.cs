@@ -314,6 +314,7 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService
             catch (Exception e)
             {
                 MessageBox.Show("Error: " + e.ToString());
+                Console.WriteLine(e.ToString());
             }
         }
 

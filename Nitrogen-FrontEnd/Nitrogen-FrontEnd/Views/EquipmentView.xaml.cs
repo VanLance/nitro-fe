@@ -24,19 +24,27 @@ namespace Nitrogen_FrontEnd.Views
         private readonly string projectNumber;
         private readonly string title;
         private readonly List<Equipment> equipmentList;
+        private Dictionary<int, Equipment> updatedRows;
 
         public EquipmentView(List<Equipment> equipmentList, string projectNumber, string title)
         {
             InitializeComponent();
+
             this.equipmentList = equipmentList;
             this.projectNumber = projectNumber;
             this.title = title;
+
             projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            project = projectService.GetProjectByProjectNumber(projectNumber);
+
             equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
             mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            project = projectService.GetProjectByProjectNumber(projectNumber);
             sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
+
+            updatedRows = new Dictionary<int, Equipment>();
+            equipmentGrid.CellEditEnding += EquipmentGrid_CellEditEnding;
+
             ShowEquipment();
         }
 
@@ -45,6 +53,35 @@ namespace Nitrogen_FrontEnd.Views
             equipmentGrid.ItemsSource = equipmentList;
             equipmentGrid.SelectedValuePath = "EquipmentId";
             equipmentGrid.AutoGenerateColumns = true;
+        }
+
+        private void EquipmentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+
+            Equipment editedEquipment = (Equipment)e.Row.Item;
+
+            if (editedEquipment != null)
+            {
+                updatedRows[editedEquipment.Id] = editedEquipment;
+            }
+        }
+
+        private void SaveAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                foreach (KeyValuePair<int, Equipment> row in updatedRows)
+                {
+                    equipmentService.EditEquipment(row.Value);
+                }
+                updatedRows.Clear();
+                MessageBox.Show("Database Updated");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show("Error: " + err.ToString());
+                Console.WriteLine(err.ToString());
+            }
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
