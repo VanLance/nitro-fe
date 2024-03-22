@@ -1,6 +1,7 @@
 ﻿using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services;
 using Nitrogen_FrontEnd.Services.DatabaseService;
+using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -32,7 +33,7 @@ namespace Nitrogen_FrontEnd.Views
             InitializeComponent();
 
             this.equipmentId = equipmentId;
-            databaseService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            databaseService = new EquipmentService(SqlConnectionString.connectionString);
             equipment = databaseService.GetSingleEquipmentById(equipmentId);
 
             ShowEquipment();

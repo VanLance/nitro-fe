@@ -136,6 +136,7 @@
     <Compile Include="Utilities\EquipmentUpdater.cs" />
     <Compile Include="Utilities\EquipmentUtility.cs" />
     <Compile Include="Utilities\ExcelWriterGenerator.cs" />
+    <Compile Include="Utilities\SqlConnectionString.cs" />
     <Compile Include="Views\AddDataFromExcel.xaml.cs">
       <DependentUpon>AddDataFromExcel.xaml</DependentUpon>
     </Compile>

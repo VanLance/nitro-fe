@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using Nitrogen_FrontEnd.Models;
 using Nitrogen_FrontEnd.Services.DatabaseService;
+using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -24,10 +25,10 @@ namespace Nitrogen_FrontEnd.Services
             FilePath = filePath;
             ExcelApp = new Application();
             Workbook = ExcelApp.Workbooks.Open(FilePath);
-            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            projectService = new ProjectService(SqlConnectionString.connectionString);
+            equipmentService = new EquipmentService(SqlConnectionString.connectionString);
+            sheetFormatService = new EquipmentSheetFormatService(SqlConnectionString.connectionString);
+            mappingService = new MappingService(SqlConnectionString.connectionString);
         }
 
         public void CloseWorkbook()

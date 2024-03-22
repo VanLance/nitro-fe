@@ -7,8 +7,8 @@ namespace Nitrogen_FrontEnd.Utilities
 {
     public static class ExcelWriterGenerator
     {
-        private static readonly ProjectService projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;"); // Instantiate the service if it's not injected
-        private static readonly EquipmentSheetFormatService sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;"); // Instantiate the service if it's not injected
+        private static readonly ProjectService projectService = new ProjectService(SqlConnectionString.connectionString); // Instantiate the service if it's not injected
+        private static readonly EquipmentSheetFormatService sheetFormatService = new EquipmentSheetFormatService(SqlConnectionString.connectionString); // Instantiate the service if it's not injected
 
         public static ExcelWriter ExcelWriter(string projectNumber)
         {

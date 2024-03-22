@@ -8,6 +8,7 @@ using Application = Microsoft.Office.Interop.Excel.Application;
 using Nitrogen_FrontEnd.Services.DatabaseService;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Nitrogen_FrontEnd.Utilities;
 
 namespace Nitrogen_FrontEnd
 {
@@ -29,10 +30,10 @@ namespace Nitrogen_FrontEnd
         public ExcelReader(string filePath)
         {
             FilePath = filePath;
-            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            projectService = new ProjectService(SqlConnectionString.connectionString);
+            mappingService = new MappingService(SqlConnectionString.connectionString);
+            equipmentService = new EquipmentService(SqlConnectionString.connectionString);
+            sheetFormatService = new EquipmentSheetFormatService(SqlConnectionString.connectionString);
 
             excelApp = new Application();
             workbook = excelApp.Workbooks.Open(FilePath);

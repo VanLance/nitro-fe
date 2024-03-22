@@ -21,8 +21,8 @@ namespace Nitrogen_FrontEnd.Views
         {
             InitializeComponent();
 
-            ProjectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            EquipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            ProjectService = new ProjectService(SqlConnectionString.connectionString);
+            EquipmentService = new EquipmentService(SqlConnectionString.connectionString);
 
             LoadProjectItems();
         }

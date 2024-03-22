@@ -34,12 +34,12 @@ namespace Nitrogen_FrontEnd.Views
             this.projectNumber = projectNumber;
             this.title = title;
 
-            projectService = new ProjectService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            projectService = new ProjectService(SqlConnectionString.connectionString);
             project = projectService.GetProjectByProjectNumber(projectNumber);
 
-            equipmentService = new EquipmentService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            sheetFormatService = new EquipmentSheetFormatService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
-            mappingService = new MappingService("Server=JAA-WIN10DEV-VM;Database=NitrogenDB;User Id=sa;Password=alpha;");
+            equipmentService = new EquipmentService(SqlConnectionString.connectionString);
+            sheetFormatService = new EquipmentSheetFormatService(SqlConnectionString.connectionString);
+            mappingService = new MappingService(SqlConnectionString.connectionString);
             sheetFormat = sheetFormatService.GetSheetFormatById(project.EquipSheetFormatId);
 
             updatedRows = new Dictionary<int, Equipment>();
