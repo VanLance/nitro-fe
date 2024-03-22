@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Excel;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -45,10 +43,28 @@ namespace Nitrogen_FrontEnd.Controls
             }
             progressBar.Visibility = Visibility.Visible;
 
-            await Task.Run(() => ExcelReader.ReadExcelFile(progressBar, Dispatcher));
+            progressBar.Value = 50;
+            await Task.Run(() => ExcelReader.ReadExcelFile(UpdateProgressBar, UpdateProgressLabel));
+
             StackPanel.Children.Remove(this);
 
             progressBar.Visibility = Visibility.Collapsed;
+        }
+
+        public void UpdateProgressBar(double progressValue)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                progressBar.Value = progressValue;
+            });
+        }
+
+        public void UpdateProgressLabel(string labelValue)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                progressLabel.Text = $"{labelValue} Status";
+            });
         }
     }
 }

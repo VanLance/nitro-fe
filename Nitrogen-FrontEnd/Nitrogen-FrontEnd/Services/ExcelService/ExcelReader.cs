@@ -48,7 +48,7 @@ namespace Nitrogen_FrontEnd
             }
         }
 
-        public void ReadExcelFile(ProgressBar progressBar, Dispatcher dispatcher)
+        public void ReadExcelFile(Action<double> updateProgressBar, Action<string> updateProgressLabel)
         {
 
             foreach (Worksheet worksheet in workbook.Sheets)
@@ -61,12 +61,15 @@ namespace Nitrogen_FrontEnd
                     int rowCount = usedRange.Rows.Count;
                     int columnCount = usedRange.Columns.Count;
 
-                    progressBar.Value =  0;
+                    updateProgressLabel(worksheetName);
+                    updateProgressBar(0);
 
                     for (int y = 1; y <= rowCount; y++)
                     {
-                        dispatcher.Invoke(() => progressBar.Value = (y / rowCount) * 100);
-                        
+                        double progressPercentage = (double)y / rowCount * 100;
+                        updateProgressBar(progressPercentage);
+
+
                         if (!isAreaInDbChecked && ProjectNumber != null)
                         {
                             isAreaInDbChecked = true;
