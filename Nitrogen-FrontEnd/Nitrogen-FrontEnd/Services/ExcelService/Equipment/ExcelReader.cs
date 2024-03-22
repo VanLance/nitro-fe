@@ -1,14 +1,11 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using Nitrogen_FrontEnd.Models;
-using Nitrogen_FrontEnd.Services;
-using System;
-using System.Windows;
-using System.Collections.Generic;
-using Application = Microsoft.Office.Interop.Excel.Application;
 using Nitrogen_FrontEnd.Services.DatabaseService;
-using System.Windows.Controls;
-using System.Windows.Threading;
 using Nitrogen_FrontEnd.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd
 {
@@ -19,10 +16,13 @@ namespace Nitrogen_FrontEnd
         private readonly MappingService mappingService;
         private readonly EquipmentService equipmentService;
         private readonly EquipmentSheetFormatService sheetFormatService;
+
         private string ProjectNumber;
         private Project project;
+
         private Dictionary<string, int> ColumnNumbers = new Dictionary<string, int>();
         public Dictionary<string, bool> SelectedAreas = new Dictionary<string, bool>();
+
         Application excelApp;
         Workbook workbook;
         string worksheetName;
@@ -105,13 +105,13 @@ namespace Nitrogen_FrontEnd
                         }
                     }
 
-                    ReleaseObject(worksheet);
+                    InteropRelease.ReleaseObject(worksheet);
                 }
             }
             workbook.Close(false);
             excelApp.Quit();
-            ReleaseObject(workbook);
-            ReleaseObject(excelApp);
+            InteropRelease.ReleaseObject(workbook);
+            InteropRelease.ReleaseObject(excelApp);
             MessageBox.Show("Complete");
         }
 
@@ -119,11 +119,10 @@ namespace Nitrogen_FrontEnd
         {
             if (cell.Value.ToString().Length >= 9)
             {
-                string checkString = cell.Value.ToString().Substring(0, 9);
-                if (checkString.ToLower() == "project #")
+                string checkString = cell.Value.ToString().Substring(0, 7);
+                if (checkString.ToLower() == "project")
                 {
-                    ProjectNumber = cell.Value.ToString().Substring(10);
-
+                    ProjectNumber = cell.Value.ToString().Substring(7).TrimStart(' ', '#');
                     project = new Project
                     {
                         ProjectNumber = cell.Value.ToString().Substring(10),
@@ -133,7 +132,6 @@ namespace Nitrogen_FrontEnd
                 }
             }
         }
-
         private bool IsProjectInDb()
         {
             return projectService.GetProjectByProjectNumber(project.ProjectNumber) != null;
@@ -279,22 +277,5 @@ namespace Nitrogen_FrontEnd
             return idDict;
         }
 
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occurred while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
-            }
-        }
     }
 }
