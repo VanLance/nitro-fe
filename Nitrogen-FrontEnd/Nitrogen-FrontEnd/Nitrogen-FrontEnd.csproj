@@ -126,8 +126,14 @@
     <Compile Include="Controls\Navigation.xaml.cs">
       <DependentUpon>Navigation.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\EquipDbFieldToExcelColumnMap.cs" />
-    <Compile Include="Models\EquipSheetFormat.cs" />
+    <Compile Include="Models\IoModel\IoSheets.cs" />
+    <Compile Include="Models\IoModel\PartType.cs" />
+    <Compile Include="Models\IoModel\RackDbFieldToExcelColumnMap.cs" />
+    <Compile Include="Models\IoModel\Slot.cs" />
+    <Compile Include="Models\ProjectModel\EquipDbFieldToExcelColumnMap.cs" />
+    <Compile Include="Models\ProjectModel\EquipSheetFormat.cs" />
+    <Compile Include="Models\IoModel\IoDbFieldToExcelMap.cs" />
+    <Compile Include="Models\ProjectModel\IoSheetFormat.cs" />
     <Compile Include="Services\DatabaseService\Equipment\EquipmentService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\EquipmentSheetFormatService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\MappingService.cs" />
@@ -201,12 +207,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Equipment.cs" />
+    <Compile Include="Models\EquipmentModel\Equipment.cs" />
     <Compile Include="Services\ExcelService\Equipment\ExcelReader.cs" />
-    <Compile Include="Models\IO.cs" />
-    <Compile Include="Models\Project.cs" />
-    <Compile Include="Models\UserDefinition.cs" />
-    <Compile Include="Models\Vendor.cs" />
+    <Compile Include="Models\IoModel\IO.cs" />
+    <Compile Include="Models\ProjectModel\Project.cs" />
+    <Compile Include="Models\EquipmentModel\UserDefinition.cs" />
+    <Compile Include="Models\EquipmentModel\Vendor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

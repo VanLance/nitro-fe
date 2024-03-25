@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Nitrogen_FrontEnd.Models
 {
-    class IO
+    public class Slot
     {
+        public int Id;
+
     }
 }

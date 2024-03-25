@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using Nitrogen_FrontEnd.Models;
+using Nitrogen_FrontEnd.Models.IO;
 using Nitrogen_FrontEnd.Utilities;
 using System;
 using System.Collections.Generic;
@@ -8,24 +9,45 @@ using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd.Services.ExcelService.IO
 {
+    class IoSheets
+    {
+        public Worksheet IoList;
+        public List<Slot> RackLayout;        
+    }
+
+    class SlotId
+    {
+        public int dbPrimaryKey;
+        public int slotNumber;
+        public string panel;
+
+        public SlotId(int slotNumber)
+        {
+            this.slotNumber = slotNumber;
+        }
+    }
+
     class IoExcelReader
     {
         private string FilePath;
         Application excelApp;
         Workbook workbook;
         string worksheetName;
+        bool isSingleRackLayoutSheet;
 
         private string ProjectNumber;
         private Project project;
+        private Dictionary<string, IoSheets> FormattedWorksheets;
         private Dictionary<string, Dictionary<string, int>> IoColumnNumbers;
         private string currentPage;
 
         public IoExcelReader(string filePath)
-        {
+        { 
             FilePath = filePath;
             excelApp = new Application();
             workbook = excelApp.Workbooks.Open(FilePath);
 
+            FormattedWorksheets = new Dictionary<string, IoSheets>();
             IoColumnNumbers = new Dictionary<string, Dictionary<string, int>>
             {
                 { "IO", new Dictionary<string, int>() },
@@ -36,8 +58,14 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         public void ReadExcelFile(Action<double> updateProgressBar, Action<string> updateProgressLabel)
         {
 
-            for (int i = workbook.Sheets.Count; i >= 1; i--)
+            FindIsSingleRackLayoutSheet(workbook.Sheets);
+
+            if( !isSingleRackLayoutSheet) FormatWorksheetDict(workbook.Sheets);
+
+            for (int i = 1; i >= workbook.Sheets.Count; i += 2)
             {
+
+
                 Worksheet worksheet = workbook.Sheets[i];
 
                 worksheetName = worksheet.Name;
@@ -100,6 +128,26 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             InteropRelease.ReleaseObject(workbook);
             InteropRelease.ReleaseObject(excelApp);
             MessageBox.Show("Complete");
+        }
+
+        private void FindIsSingleRackLayoutSheet(Sheets sheets)
+        {
+            foreach (Worksheet worksheet in sheets)
+            {
+                if (worksheet.Name == "Rack Layouts") isSingleRackLayoutSheet = true;
+            }
+        }
+
+        private void FormatWorksheetDict(Sheets sheets)
+        {
+            for (int i = 1; i >= workbook.Sheets.Count; i += 2)
+            {
+                IoSheets ioSheets = new IoSheets();
+                ioSheets.RackLayout = sheets[i + 1];
+                ioSheets.IoList = sheets[i];
+
+                FormattedWorksheets[sheets[i].Name] = ioSheets;
+            }
         }
 
         private void FindProjectNumber(Range cell, Range usedRange)
