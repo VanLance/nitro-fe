@@ -12,7 +12,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
     class IoSheets
     {
         public Worksheet IoList;
-        public List<Slot> RackLayout;        
+        public List<Slot> RackLayout;
     }
 
     class SlotId
@@ -42,7 +42,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         private string currentPage;
 
         public IoExcelReader(string filePath)
-        { 
+        {
             FilePath = filePath;
             excelApp = new Application();
             workbook = excelApp.Workbooks.Open(FilePath);
@@ -58,9 +58,32 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         public void ReadExcelFile(Action<double> updateProgressBar, Action<string> updateProgressLabel)
         {
 
+            foreach (Worksheet worksheet in workbook.Sheets)
+            {
+                if (worksheet.Name == "Rack Layout" && FormattedWorksheets.ContainsKey("IO List"))
+                {
+                    ParseRackSheetForSingleIo(FormattedWorksheets["IO List"], worksheet);
+                }
+                else if (worksheet.Name.EndsWith("Rack Layout"))
+                {
+                    int index = worksheet.Name.LastIndexOf("Rack Layout");
+                    string RackArea = worksheet.Name.Substring(0, index).Trim();
+
+                    if (FormattedWorksheets.ContainsKey(RackArea)) ParseRackSheetForSingleIo(FormattedWorksheets[RackArea], worksheet);
+                    else if (RackArea == "PLC" && FormattedWorksheets.ContainsKey("PLC Control")) ParseRackSheetForSingleIo(FormattedWorksheets["PLC Control"], worksheet);
+                }
+                else
+                {
+                    FormattedWorksheets[worksheet.Name] = new IoSheets()
+                    {
+                        IoList = worksheet
+                    };
+                }
+            }
+
             FindIsSingleRackLayoutSheet(workbook.Sheets);
 
-            if( !isSingleRackLayoutSheet) FormatWorksheetDict(workbook.Sheets);
+            if (!isSingleRackLayoutSheet) FormatWorksheetDict(workbook.Sheets);
 
             for (int i = 1; i >= workbook.Sheets.Count; i += 2)
             {
@@ -128,6 +151,11 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             InteropRelease.ReleaseObject(workbook);
             InteropRelease.ReleaseObject(excelApp);
             MessageBox.Show("Complete");
+        }
+
+        private void ParseRackSheetForSingleIo(IoSheets worksheet, Worksheet rackWorkSheet)
+        {
+            throw new NotImplementedException();
         }
 
         private void FindIsSingleRackLayoutSheet(Sheets sheets)
