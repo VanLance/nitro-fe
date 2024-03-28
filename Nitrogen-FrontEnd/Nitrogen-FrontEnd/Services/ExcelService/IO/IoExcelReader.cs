@@ -23,13 +23,10 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         private readonly EquipmentService equipmentService;
         private readonly IoLayoutFormatService ioFormatService;
 
-        string worksheetName;
-
         private string ProjectNumber;
         private Project project;
         private Dictionary<string, IoSheets> FormattedWorksheets;
         private IoColumnNumbers IoColumnNumbers;
-        private string currentPage;
 
         public IoExcelReader(string filePath)
         {
@@ -185,6 +182,8 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
                 }
                 else
                 {
+                    var bankCellValue = usedRange[y, IoColumnNumbers.RackLayout["bank"]].Value;
+                    if (bankCellValue != null && bankCellValue.ToString().ToLower() == "bank") continue;
                     currentBank = UpdateCurrentBank(usedRange, y, currentBank);
                     if (currentBank != -1 && ioSheets.RackDataStartingLine == 0)
                     {
