@@ -137,6 +137,9 @@
     <Compile Include="Services\DatabaseService\Equipment\EquipmentService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\EquipmentSheetFormatService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\MappingService.cs" />
+    <Compile Include="Services\DatabaseService\IO\PartTypeService.cs" />
+    <Compile Include="Services\DatabaseService\IO\IoLayoutFormatService.cs" />
+    <Compile Include="Services\DatabaseService\IO\SlotService.cs" />
     <Compile Include="Services\DatabaseService\ProjectService.cs" />
     <Compile Include="Services\ExcelService\Equipment\ExcelWriter.cs" />
     <Compile Include="Services\ExcelService\IO\IoExcelReader.cs" />
@@ -239,8 +242,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\DatabaseService\IO\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

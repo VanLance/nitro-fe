@@ -9,6 +9,8 @@ namespace Nitrogen_FrontEnd.Models
     public class Slot
     {
         public int Id;
-
+        public int Number;
+        public int Bank;
+        public string TypeId;
     }
 }
