@@ -19,7 +19,7 @@ namespace Nitrogen_FrontEnd.Utilities
 
             if (ids.Length > 1 && ids[1] != "0" && ids[1] != "00")
             {
-                idDict.Add("subId", ids[1]);
+                idDict.Add("subId", ids[1].TrimEnd('0'));
             }
 
             return idDict;

@@ -137,6 +137,7 @@
     <Compile Include="Services\DatabaseService\Equipment\EquipmentService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\EquipmentSheetFormatService.cs" />
     <Compile Include="Services\DatabaseService\Equipment\MappingService.cs" />
+    <Compile Include="Services\DatabaseService\IO\IoService.cs" />
     <Compile Include="Services\DatabaseService\IO\PartTypeService.cs" />
     <Compile Include="Services\DatabaseService\IO\IoLayoutFormatService.cs" />
     <Compile Include="Services\DatabaseService\IO\SlotService.cs" />

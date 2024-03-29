@@ -10,7 +10,7 @@ using System.Windows;
 using Application = Microsoft.Office.Interop.Excel.Application;
 
 namespace Nitrogen_FrontEnd.Services.ExcelService.IO
-{ 
+{
 
     class IoExcelReader
     {
@@ -22,6 +22,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         private readonly SlotService slotService;
         private readonly EquipmentService equipmentService;
         private readonly IoLayoutFormatService ioFormatService;
+        private readonly IoService ioService;
 
         private string ProjectNumber;
         private Project project;
@@ -38,6 +39,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             slotService = new SlotService(SqlConnectionString.connectionString);
             equipmentService = new EquipmentService(SqlConnectionString.connectionString);
             ioFormatService = new IoLayoutFormatService(SqlConnectionString.connectionString);
+            ioService = new IoService(SqlConnectionString.connectionString);
 
             FormattedWorksheets = new Dictionary<string, IoSheets>();
             IoColumnNumbers = new IoColumnNumbers()
@@ -64,6 +66,8 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         {
             foreach (KeyValuePair<string, IoSheets> entry in FormattedWorksheets)
             {
+
+                Console.WriteLine("Parsing IO SHEETS \n\n");
                 Range usedRange = entry.Value.IoList.UsedRange;
                 int rowCount = usedRange.Rows.Count;
                 int columnCount = usedRange.Columns.Count;
@@ -78,7 +82,8 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
                     double progressPercentage = (double)y / rowCount * 100;
                     //updateProgressBar(progressPercentage);
 
-                    if (IoColumnNumbers.IO.Count == 0)
+                    Console.WriteLine($"{IoColumnNumbers.IO.Count} dict count");
+                    if (IoColumnNumbers.IO.Count < 7)
                     {
                         for (int x = 1; x <= columnCount; x++)
                         {
@@ -91,15 +96,16 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
                                 }
                                 else
                                 {
-                                    AddRackColumnNumbers(cell, columnCount);
+                                    AddIoColumnNumbers(cell, columnCount);
                                 }
                             }
                         }
                     }
                     else
                     {
-                        currentSlot = UpdateCurrentBank(usedRange, y, currentSlot);
-                        if (currentSlot != -1 && entry.Value.IoDataStartingLine == 0)
+                        currentSlot = UpdateCurrentSlotValue(usedRange, y, currentSlot, false);
+                        Console.WriteLine($"Current Slot {currentSlot}\nSTARTINGLINE: {entry.Value.IoDataStartingLine}\n");
+                        if (usedRange.Cells[y, IoColumnNumbers.IO["module"]].Value != null && entry.Value.IoDataStartingLine == 0)
                         {
                             entry.Value.IoDataStartingLine = y;
                             AddIoFormatToDb(y, IoColumnNumbers.IO, entry.Value);
@@ -110,11 +116,45 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             }
         }
 
+        private void AddIoFromRow(Range usedRange, int row, int currentSlot, IoSheets ioSheets)
+        {
+            Dictionary<string, int> ioDict = IoColumnNumbers.IO;
+            if (usedRange.Cells[row, ioDict["plc point"]].Value == null && usedRange.Cells[row, ioDict["module"]].Value == null) return;
+
+            foreach (KeyValuePair<string, int> entry in IoColumnNumbers.IO) Console.WriteLine($"K: {entry.Key}\nV: {entry.Value}");
+
+            Console.WriteLine($"CellValues\nDESC: {usedRange.Cells[row, ioDict["description"]].Value}\nPLCPOINT: {usedRange[row, ioDict["plc point"]].Value}\nSLOTID:{usedRange[row, ioDict["plc point"]].Value}\n");
+
+            Console.WriteLine($"iosheetformatID: {ioSheets.SheetsId}\n");
+
+            IoModel io = new IoModel()
+            {
+                Description = usedRange.Cells[row, ioDict["description"]].Value,
+                PlcPoint = usedRange[row, ioDict["plc point"]].Value,
+                SlotId = ioSheets.RackLayout[currentSlot].Id,
+
+                IoSheetsId = ioSheets.SheetsId,
+            };
+
+            Console.WriteLine($"IOVALUES\nSLOTID:{io.SlotId}\nDESC:{io.Description}\nPLCPOINT:{io.PlcPoint}\n");
+            string equipmentIdCellValue = usedRange.Cells[row, ioDict["id"]].Value;
+            if (equipmentIdCellValue != null)
+            {
+                Dictionary<string, string> ioEquipmentIds = EquipmentUtility.ExtractEquipmentIdAndSubId(equipmentIdCellValue);
+                io.EquipmentId = equipmentService.GetSingleEquipmentByIdsAndProjectNumber(ioEquipmentIds["id"], ioEquipmentIds["subId"], ProjectNumber).Id;
+            }
+
+            Console.WriteLine($"{io.PlcPoint} plc point");
+            ioService.AddIo(io);
+        }
+
         private void AddIoFormatToDb(int row, Dictionary<string, int> io, IoSheets ioSheets)
         {
+            Console.WriteLine("ADDING FORMATS");
             int ioMapId = ioFormatService.AddIoDbFieldToExcelMap(io);
             int ioSheetFormatId = ioFormatService.AddIoSheetFormat(FilePath, ioMapId, ioSheets.RackDbToExcelMapId);
-            ioSheets.SheetFormatId = ioFormatService.AddIoSheets(row, ioSheets, ioSheetFormatId);
+
+            ioSheets.SheetsId = ioFormatService.AddIoSheets(row, ioSheets, ioSheetFormatId);
         }
 
         private void UpdateFormattedWorksheetsDict(/*Action<double> updateProgressBar, Action<string> updateProgressLabel*/)
@@ -184,7 +224,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
                 {
                     var bankCellValue = usedRange[y, IoColumnNumbers.RackLayout["bank"]].Value;
                     if (bankCellValue != null && bankCellValue.ToString().ToLower() == "bank") continue;
-                    currentBank = UpdateCurrentBank(usedRange, y, currentBank);
+                    currentBank = UpdateCurrentBank(usedRange, y, currentBank, true);
                     if (currentBank != -1 && ioSheets.RackDataStartingLine == 0)
                     {
                         ioSheets.RackDataStartingLine = y;
@@ -200,41 +240,36 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             ioSheets.RackDbToExcelMapId = ioFormatService.AddRackDbFieldToExcelMap(rackLayout);
         }
 
-        private void AddIoFromRow(Range usedRange, int row, int currentSlot, IoSheets ioSheets)
+
+        private int UpdateCurrentSlotValue(Range usedRange, int y, int currentSlotValue, bool rackLayout)
         {
-            Dictionary<string, int> ioDict = IoColumnNumbers.IO;
-            Dictionary<string, string> ioEquipmentIds = EquipmentUtility.ExtractEquipmentIdAndSubId(usedRange.Cells[row, ioDict["id"]]);
-            IoModel io = new IoModel()
+            Dictionary<string, int> columnsDict = rackLayout ? IoColumnNumbers.RackLayout : IoColumnNumbers.IO;
+            int columnIndex = columnsDict["slot"];
+            Range cell = usedRange.Cells[y, columnIndex];
+
+            if (cell != null)
             {
-                Description = usedRange.Cells[row, ioDict["description"]],
-                PlcPoint = usedRange[row, ioDict["plc point"]],
-                SlotId = ioSheets.RackLayout[currentSlot].Id,
-
-                IoSheetsId = ioSheets.SheetFormatId,
-            };
-
-            var idsDict = EquipmentUtility.ExtractEquipmentIdAndSubId(usedRange.Cells[row, ioDict["Id"]]);
-            io.EquipmentId = equipmentService.GetSingleEquipmentByIdsAndProjectNumber(idsDict["id"], idsDict["subId"], ProjectNumber).Id;
-
+                if (cell.Value != null && int.TryParse(cell.Value.ToString(), out int slotValue))
+                {
+                    if (cell.Value.ToString() == "-") return currentSlotValue;
+                    return (int)cell.Value;
+                }
+            }
+            return currentSlotValue;
         }
 
-        private int UpdateCurrentSlotValue(Range usedRange, int y, int currentSlotValue)
+        private int UpdateCurrentBank(Range usedRange, int y, int bank, bool rackLayout)
         {
-            int slotCellValue = (int)usedRange[y, IoColumnNumbers.RackLayout["slot"]];
-            return usedRange.Cells[y, slotCellValue] != null ? slotCellValue : currentSlotValue;
-        }
-
-        private int UpdateCurrentBank(Range usedRange, int y, int bank)
-        {
-            Console.WriteLine(bank + " bank \n\n");
-            var bankCellValue = usedRange[y, IoColumnNumbers.RackLayout["bank"]].Value ;
-            if (bankCellValue != null) Console.WriteLine(bankCellValue.ToString());
-            return bankCellValue != null ? (int)bankCellValue : bank;
+            Dictionary<string, int> columnDict = rackLayout ? IoColumnNumbers.RackLayout : IoColumnNumbers.IO;
+            var bankCellValue = usedRange[y, columnDict["bank"]].Value;
+            Console.WriteLine(bank + $"bank \n\nBankCell: {bankCellValue}");
+            if (bankCellValue != null) return (int)bankCellValue;
+            return bank;
         }
 
         private void AddRackLayoutFromRow(Range usedRange, int row, int bank, IoSheets ioSheets)
         {
-            if (usedRange.Cells[row, IoColumnNumbers.RackLayout["type"]].Value == null) return; 
+            if (usedRange.Cells[row, IoColumnNumbers.RackLayout["type"]].Value == null) return;
 
             PartType partType = new PartType()
             {
@@ -253,6 +288,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
             };
 
             slot.Id = slotService.AddSlot(slot);
+            Console.WriteLine($"ADING SLOT\nSLOTID: {slot.Id}");
             ioSheets.RackLayout[slot.Number] = slot;
         }
 
@@ -302,6 +338,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
                 case "description":
                 case "id":
                 case "plc point":
+                case "module":
                     if (!IoColumnNumbers.IO.ContainsKey(cellValue))
                     {
                         IoColumnNumbers.IO[cellValue] = cell.Column;
@@ -336,7 +373,7 @@ namespace Nitrogen_FrontEnd.Services.ExcelService.IO
         public int RackDataStartingLine;
         public int IoDataStartingLine;
         public int RackDbToExcelMapId;
-        public int SheetFormatId;
+        public int SheetsId;
     }
 
     class IoColumnNumbers

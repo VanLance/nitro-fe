@@ -27,12 +27,11 @@ namespace Nitrogen_FrontEnd.Services.DatabaseService.IO
                 using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
                     command.Parameters.AddWithValue("@Number", slot.Number);
-                    command.Parameters.AddWithValue("@Id", slot.Id);
                     command.Parameters.AddWithValue("@Bank", slot.Bank);
                     command.Parameters.AddWithValue("@TypeId", slot.TypeId);
 
                     connection.Open();
-                    return (int)command.ExecuteNonQuery();
+                    return (int)command.ExecuteScalar();
                 }
             }
         }
