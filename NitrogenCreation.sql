@@ -74,19 +74,87 @@ CREATE TABLE Equipment (
 	CONSTRAINT FK_UserDefinition FOREIGN KEY (UserDefinitionId) REFERENCES UserDefinition (Id)
 );
 
-CREATE TABLE [IO] (
-	Id INT PRIMARY KEY IDENTITY,
-	EquipmentId INT NOT NULL,
 
-	CONSTRAINT FK_IO FOREIGN KEY (EquipmentId) REFERENCES Equipment (Id)
+CREATE TABLE IoDbFieldToExcelColumnMap(
+	Id INT PRIMARY KEY IDENTITY,
+	Slot INT NOT NULL,
+	PlcPoint INT NOT NULL,
+	EquipmentId INT NOT NULL,
+	[Description] INT NOT NULL,
 );
 
-DELETE FROM EquipDbFieldToExcelColumnMap;
-DELETE FROM EquipSheetFormat;
+CREATE TABLE RackDbFieldToExcelColumnMap(
+	Id INT PRIMARY KEY IDENTITY,
+	Slot INT NOT NULL,
+	[TYPE] INT NOT NULL,
+	[DESCRIPTION] INT NOT Null,
+);
+
+CREATE TABLE IoSheetFormat (
+	Id INT PRIMARY KEY IDENTITY,
+	[FileName] NVARCHAR(250) NOT NULL,
+
+	IoDbFieldToExcelColumnMapId INT NOT NULL,
+	CONSTRAINT FK_IoDbFieldToExcelColumnMap FOREIGN KEY (IoDbFieldToExcelColumnMapId) REFERENCES IoDbFieldToExcelColumnMap (Id),
+	RackDbFieldToExcelColumnMapId INT NOT NULL,
+	CONSTRAINT FK_RackDbFieldToExcelColumnMap FOREIGN KEY (RackDbFieldToExcelColumnMapId) REFERENCES RackDbFieldToExcelColumnMap (Id)
+);
+
+CREATE TABLE IoSheets(
+	Id INT PRIMARY KEY IDENTITY,
+	[Name] VARCHAR NOT NULL,
+	StartingIODataLine INT NOT NULL,
+	StartingRackDataLine INT NOT NULL,
+	IoSheetFormatId INT NOT NULL,
+
+	CONSTRAINT FK_IoSheetFormat FOREIGN KEY (IoSheetFormatId) REFERENCES IoSheetFormat (Id)
+);
+
+CREATE TABLE PartType (
+	Id VARCHAR PRIMARY KEY,
+	[Description] VARCHAR NOT NULL,
+);
+
+CREATE TABLE Slot (
+	Id INT PRIMARY KEY IDENTITY,
+	Number Int,
+	Bank Int,
+	TypeId VARCHAR NOT NULL, 
+
+	CONSTRAINT FK_Type FOREIGN KEY (TypeId) REFERENCES Type (Id)
+);
+
+CREATE TABLE [IO] (
+	Id INT PRIMARY KEY IDENTITY,
+	[Description] VARCHAR NOT NULL,
+	EquipmentId INT NOT NULL,
+	SlotId Int NOT NULL,
+	PlcPoint VARCHAR,
+	IoSheetsId INT NOT NULL,
+
+	CONSTRAINT FK_IO FOREIGN KEY (EquipmentId) REFERENCES Equipment (Id),
+	CONSTRAINT FK_Slot FOREIGN KEY (SlotId) REFERENCES Slot (Id),
+	CONSTRAINT FK_Io_Name FOREIGN KEY (IoNameId) REFERENCES IoSheets (Id)
+);
+
+drop table if exists [IO];
+drop table if exists Slot;
+drop table if exists [Type];
+
 DELETE FROM Equipment;
 DELETE FROM PROJECT;
+DELETE FROM EquipSheetFormat;
+DELETE FROM EquipDbFieldToExcelColumnMap;
 
 SELECT * From EquipDbFieldToExcelColumnMap;
 SELECT * FROM EquipSheetFormat;
 SELECT * FROM Project;
-SELECT * FROM Equipment ORDER BY ExcelRowNumber;
+SELECT * FROM Equipment WHERE EquipmentId = 'B2' AND EquipmentSubId = '5';
+
+
+SELECT * FROM PartType;
+SELECT * FROM [Slot];
+SELECT * FROM [IO];
+SELECT * FROM IoSheetFormat;
+SELECT * FROM  RackDbFieldToExcelColumnMap;
+SELECT * FROM IoDbFieldToExcelColumnMap;
